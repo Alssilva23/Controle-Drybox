@@ -30,8 +30,8 @@ function App() {
     {
       id: 1,
       codigo: "3030",
-      nome: "base",
-      local: "caixa2",
+      nome: "Base",
+      local: "Caixa 2",
       quantidade: 10,
     },
   ])
