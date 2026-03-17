@@ -343,7 +343,7 @@ function Dashboard({
                       onMouseLeave={() => setLinhaHover(null)}
                       style={{
                         cursor: "pointer",
-                        background: linhaHover === item.id ? "#f5f5f5" : "white",
+                        background: linhaHover === item.id ? "#d1d5db" : "white",
                         transition: "background 0.2s ease",
                       }}
                     >
