@@ -22,7 +22,6 @@ function App() {
       .order("id", { ascending: true })
 
     if (error) {
-      console.error("Erro ao carregar usuários:", error)
       alert("ERRO SUPABASE: " + error.message)
       return
     }
@@ -35,25 +34,11 @@ function App() {
         perfil: u.perfil,
       }))
 
-      const { error: insertError } = await supabase
-        .from("usuarios")
-        .insert(usuariosParaInserir)
+      await supabase.from("usuarios").insert(usuariosParaInserir)
 
-      if (insertError) {
-        console.error("Erro ao criar usuários padrão:", insertError)
-        alert("ERRO INSERT: " + insertError.message)
-        return
-      }
-
-      const { data: novosUsuarios, error: novoErro } = await supabase
+      const { data: novosUsuarios } = await supabase
         .from("usuarios")
         .select("*")
-        .order("id", { ascending: true })
-
-      if (novoErro) {
-        alert("ERRO AO BUSCAR NOVOS: " + novoErro.message)
-        return
-      }
 
       setUsuarios(novosUsuarios || [])
       return
@@ -63,32 +48,11 @@ function App() {
   }
 
   async function carregarItens() {
-    const { data: itensData, error: itensError } = await supabase
+    const { data } = await supabase
       .from("itens")
       .select("*")
-      .order("id", { ascending: false })
 
-    if (itensError) {
-      console.error("Erro ao carregar itens:", itensError)
-      return
-    }
-
-    const { data: historicoData, error: historicoError } = await supabase
-      .from("historico")
-      .select("*")
-      .order("id", { ascending: false })
-
-    if (historicoError) {
-      console.error("Erro ao carregar histórico:", historicoError)
-      return
-    }
-
-    const itensComHistorico = (itensData || []).map((item) => ({
-      ...item,
-      historico: (historicoData || []).filter((h) => h.item_id === item.id),
-    }))
-
-    setItens(itensComHistorico)
+    setItens(data || [])
   }
 
   async function carregarDados() {
@@ -102,62 +66,23 @@ function App() {
     carregarDados()
   }, [])
 
-  function abrirItem(id) {
-    setItemSelecionadoId(id)
-    setModoTela("item")
-  }
-
-  function voltarDashboard() {
-    setItemSelecionadoId(null)
-    setModoTela("dashboard")
-  }
-
   function sair() {
     setUsuarioLogado(null)
-    setItemSelecionadoId(null)
-    setModoTela("dashboard")
   }
 
-  if (carregando) {
-    return <div style={{ padding: "20px" }}>Carregando...</div>
-  }
+  if (carregando) return <div>Carregando...</div>
 
   if (!usuarioLogado) {
-    return (
-      <Login
-        onLogin={setUsuarioLogado}
-        usuarios={usuarios}
-      />
-    )
-  }
-
-  if (modoTela === "admin-usuarios") {
-    return (
-      <AdminUsuarios
-        usuarioLogado={usuarioLogado}
-        usuarios={usuarios}
-        salvarUsuarios={setUsuarios}
-        voltar={voltarDashboard}
-      />
-    )
-  }
-
-  if (modoTela === "novo-item") {
-    return (
-      <NovoItem
-        voltar={voltarDashboard}
-        adicionarItem={() => {}}
-      />
-    )
+    return <Login onLogin={setUsuarioLogado} usuarios={usuarios} />
   }
 
   return (
     <Dashboard
       usuario={usuarioLogado}
       itens={itens}
-      aoSelecionarItem={abrirItem}
-      aoNovoItem={() => setModoTela("novo-item")}
-      aoAbrirAdmin={() => setModoTela("admin-usuarios")}
+      aoSelecionarItem={() => {}}
+      aoNovoItem={() => {}}
+      aoAbrirAdmin={() => {}}
       aoSair={sair}
     />
   )
