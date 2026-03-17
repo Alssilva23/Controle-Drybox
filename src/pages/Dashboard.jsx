@@ -1,8 +1,8 @@
 import { useState } from "react"
 
 function Dashboard({
-  usuario,
-  itens,
+  usuario = {},
+  itens = [],
   aoSelecionarItem,
   aoNovoItem,
   aoAbrirAdmin,
@@ -11,21 +11,35 @@ function Dashboard({
   const [busca, setBusca] = useState("")
 
   const itensFiltrados = itens.filter((item) => {
-    const termo = busca.toLowerCase()
+    const termo = busca.trim().toLowerCase()
+
+    const codigo = String(item.codigo || "").toLowerCase()
+    const nome = String(item.nome || "").toLowerCase()
+    const local = String(item.local || "").toLowerCase()
 
     return (
-      item.codigo.toLowerCase().includes(termo) ||
-      item.nome.toLowerCase().includes(termo) ||
-      item.local.toLowerCase().includes(termo)
+      codigo.includes(termo) ||
+      nome.includes(termo) ||
+      local.includes(termo)
     )
   })
 
   const totalItens = itens.length
-  const totalPecas = itens.reduce((acc, item) => acc + item.quantidade, 0)
-  const esgotados = itens.filter((item) => item.quantidade === 0).length
+  const totalPecas = itens.reduce(
+    (acc, item) => acc + Number(item.quantidade || 0),
+    0
+  )
+  const esgotados = itens.filter(
+    (item) => Number(item.quantidade || 0) === 0
+  ).length
 
   function exportarLista() {
     const janela = window.open("", "", "width=900,height=700")
+
+    if (!janela) {
+      alert("Não foi possível abrir a janela de impressão")
+      return
+    }
 
     janela.document.write(`
       <html>
@@ -51,7 +65,7 @@ function Dashboard({
             .map(
               (item) => `
                 <div class="linha">
-                  <strong>${item.codigo}</strong> | ${item.nome} | ${item.local} | ${item.quantidade}
+                  <strong>${item.codigo ?? ""}</strong> | ${item.nome ?? ""} | ${item.local ?? ""} | ${item.quantidade ?? 0}
                 </div>
               `
             )
@@ -61,21 +75,61 @@ function Dashboard({
     `)
 
     janela.document.close()
+    janela.focus()
     janela.print()
   }
 
   function abrirAdministracao() {
-    if (usuario.perfil !== "admin") {
+    if (usuario?.perfil !== "admin") {
       alert("Somente admin pode acessar essa área")
       return
     }
 
-    aoAbrirAdmin()
+    if (typeof aoAbrirAdmin === "function") {
+      aoAbrirAdmin()
+    } else {
+      alert("Função de administração não foi passada")
+    }
+  }
+
+  function novoItem() {
+    if (typeof aoNovoItem === "function") {
+      aoNovoItem()
+    } else {
+      alert("Função de novo item não foi passada")
+    }
+  }
+
+  function sair() {
+    if (typeof aoSair === "function") {
+      aoSair()
+    } else {
+      alert("Função de sair não foi passada")
+    }
+  }
+
+  function selecionarItem(id) {
+    if (typeof aoSelecionarItem === "function") {
+      aoSelecionarItem(id)
+    }
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial" }}>
-      <div style={{ display: "flex" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "#f3f4f6",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          minHeight: "100vh",
+        }}
+      >
         <div
           style={{
             width: "260px",
@@ -84,6 +138,7 @@ function Dashboard({
             minHeight: "100vh",
             padding: "24px",
             boxSizing: "border-box",
+            flexShrink: 0,
           }}
         >
           <h2 style={{ margin: 0, color: "#16a34a" }}>DryBox</h2>
@@ -97,13 +152,17 @@ function Dashboard({
               borderRadius: "10px",
             }}
           >
-            <div style={{ fontWeight: "bold", color: "#111827" }}>{usuario.nome}</div>
+            <div style={{ fontWeight: "bold", color: "#111827" }}>
+              {usuario?.nome || "Usuário"}
+            </div>
+
             <div style={{ color: "#6b7280", fontSize: "14px", marginTop: "4px" }}>
-              Perfil: {usuario.perfil}
+              Perfil: {usuario?.perfil || "-"}
             </div>
 
             <button
-              onClick={aoSair}
+              type="button"
+              onClick={sair}
               style={{
                 marginTop: "12px",
                 width: "100%",
@@ -120,35 +179,51 @@ function Dashboard({
           </div>
 
           <div style={{ marginTop: "30px" }}>
-            <div
+            <button
+              type="button"
               style={{
+                width: "100%",
                 background: "#16a34a",
                 color: "white",
                 padding: "12px",
                 borderRadius: "10px",
                 marginBottom: "10px",
+                border: "none",
+                cursor: "default",
+                fontSize: "16px",
               }}
             >
               Controle de Componentes
-            </div>
+            </button>
 
-            <div
+            <button
+              type="button"
               onClick={abrirAdministracao}
               style={{
+                width: "100%",
                 padding: "12px",
                 borderRadius: "10px",
                 color: "#374151",
                 marginBottom: "10px",
                 background: "#f9fafb",
                 cursor: "pointer",
+                border: "none",
+                fontSize: "16px",
               }}
             >
               Administração
-            </div>
+            </button>
           </div>
         </div>
 
-        <div style={{ flex: 1, padding: "30px" }}>
+        <div
+          style={{
+            flex: 1,
+            padding: "30px",
+            boxSizing: "border-box",
+            width: "100%",
+          }}
+        >
           <div style={{ marginBottom: "24px" }}>
             <h1
               style={{
@@ -158,7 +233,7 @@ function Dashboard({
                 color: "#111827",
               }}
             >
-              Bem-vindo, {usuario.nome}
+              Bem-vindo, {usuario?.nome || "Usuário"}
             </h1>
 
             <p
@@ -256,7 +331,7 @@ function Dashboard({
 
                 <button
                   type="button"
-                  onClick={aoNovoItem}
+                  onClick={novoItem}
                   style={{
                     background: "#16a34a",
                     color: "white",
@@ -281,6 +356,7 @@ function Dashboard({
                   transform: "translateY(-50%)",
                   color: "#6b7280",
                   fontSize: "16px",
+                  pointerEvents: "none",
                 }}
               >
                 🔍
@@ -316,7 +392,7 @@ function Dashboard({
                 {itensFiltrados.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="4"
+                      colSpan={4}
                       style={{
                         padding: "20px",
                         textAlign: "center",
@@ -330,7 +406,7 @@ function Dashboard({
                   itensFiltrados.map((item) => (
                     <tr
                       key={item.id}
-                      onClick={() => aoSelecionarItem(item.id)}
+                      onClick={() => selecionarItem(item.id)}
                       style={{ cursor: "pointer" }}
                     >
                       <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
@@ -343,8 +419,10 @@ function Dashboard({
                         {item.local}
                       </td>
                       <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.quantidade === 0 ? (
-                          <span style={{ color: "#dc2626", fontWeight: "bold" }}>Esgotado</span>
+                        {Number(item.quantidade || 0) === 0 ? (
+                          <span style={{ color: "#dc2626", fontWeight: "bold" }}>
+                            Esgotado
+                          </span>
                         ) : (
                           item.quantidade
                         )}
