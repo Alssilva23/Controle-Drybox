@@ -5,83 +5,99 @@ import ItemDetalhe from "./pages/ItemDetalhe.jsx"
 import NovoItem from "./pages/NovoItem.jsx"
 import AdminUsuarios from "./pages/AdminUsuarios.jsx"
 import usuariosPadrao from "./data/usuarios.js"
+import { supabase } from "./supabase.js"
 
 function App() {
   const [usuarioLogado, setUsuarioLogado] = useState(null)
   const [modoTela, setModoTela] = useState("dashboard")
   const [itemSelecionadoId, setItemSelecionadoId] = useState(null)
+  const [usuarios, setUsuarios] = useState([])
+  const [itens, setItens] = useState([])
+  const [carregando, setCarregando] = useState(true)
 
-  const [usuarios, setUsuarios] = useState(() => {
-    const usuariosSalvos = localStorage.getItem("drybox_usuarios")
+  async function carregarUsuarios() {
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("*")
+      .order("id", { ascending: true })
 
-    if (usuariosSalvos) {
-      return JSON.parse(usuariosSalvos)
+    if (error) {
+      console.error("Erro ao carregar usuários:", error)
+      return
     }
 
-    localStorage.setItem("drybox_usuarios", JSON.stringify(usuariosPadrao))
-    return usuariosPadrao
-  })
+    if (!data || data.length === 0) {
+      const usuariosParaInserir = usuariosPadrao.map((u) => ({
+        nome: u.nome,
+        usuario: u.usuario,
+        senha: u.senha,
+        perfil: u.perfil,
+      }))
 
-  const [itens, setItens] = useState(() => {
-    const dadosSalvos = localStorage.getItem("drybox_itens")
+      const { error: insertError } = await supabase
+        .from("usuarios")
+        .insert(usuariosParaInserir)
 
-    if (dadosSalvos) {
-      return JSON.parse(dadosSalvos)
+      if (insertError) {
+        console.error("Erro ao criar usuários padrão:", insertError)
+        return
+      }
+
+      const { data: novosUsuarios, error: novoErro } = await supabase
+        .from("usuarios")
+        .select("*")
+        .order("id", { ascending: true })
+
+      if (!novoErro) {
+        setUsuarios(novosUsuarios || [])
+      }
+      return
     }
 
-    return [
-      {
-        id: 1,
-        codigo: "RES-10K-0603",
-        nome: "Resistor 10k 0603",
-        local: "Caixa A1",
-        quantidade: 145,
-        historico: [
-          {
-            usuario: "Alessandra",
-            tipo: "saida",
-            quantidade: 5,
-            comentario: "Sobra ordem 1563",
-            data: "16/03/2026 09:35",
-          },
-        ],
-      },
-      {
-        id: 2,
-        codigo: "CAP-10UF-16V",
-        nome: "Capacitor 10uF 16V",
-        local: "Caixa B2",
-        quantidade: 0,
-        historico: [],
-      },
-      {
-        id: 3,
-        codigo: "REG-3V3",
-        nome: "Regulador 3.3V",
-        local: "Caixa C1",
-        quantidade: 12,
-        historico: [],
-      },
-      {
-        id: 4,
-        codigo: "USB-C-24P",
-        nome: "Conector USB-C 24 pinos",
-        local: "Caixa D3",
-        quantidade: 8,
-        historico: [],
-      },
-    ]
-  })
+    setUsuarios(data)
+  }
+
+  async function carregarItens() {
+    const { data: itensData, error: itensError } = await supabase
+      .from("itens")
+      .select("*")
+      .order("id", { ascending: false })
+
+    if (itensError) {
+      console.error("Erro ao carregar itens:", itensError)
+      return
+    }
+
+    const { data: historicoData, error: historicoError } = await supabase
+      .from("historico")
+      .select("*")
+      .order("id", { ascending: false })
+
+    if (historicoError) {
+      console.error("Erro ao carregar histórico:", historicoError)
+      return
+    }
+
+    const itensComHistorico = (itensData || []).map((item) => ({
+      ...item,
+      historico: (historicoData || []).filter((h) => h.item_id === item.id),
+    }))
+
+    setItens(itensComHistorico)
+  }
+
+  async function carregarDados() {
+    setCarregando(true)
+    await carregarUsuarios()
+    await carregarItens()
+    setCarregando(false)
+  }
 
   useEffect(() => {
-    localStorage.setItem("drybox_itens", JSON.stringify(itens))
-  }, [itens])
+    carregarDados()
+  }, [])
 
-  useEffect(() => {
-    localStorage.setItem("drybox_usuarios", JSON.stringify(usuarios))
-  }, [usuarios])
-
-  function registrarMovimentacao(itemId, tipo, quantidade, comentario) {
+  async function registrarMovimentacao(itemId, tipo, quantidade, comentario) {
     const qtd = Number(quantidade)
 
     if (!qtd || qtd <= 0) {
@@ -89,55 +105,77 @@ function App() {
       return
     }
 
-    setItens((listaAtual) =>
-      listaAtual.map((item) => {
-        if (item.id !== itemId) return item
+    const item = itens.find((i) => i.id === itemId)
+    if (!item) return
 
-        const novaQuantidade =
-          tipo === "entrada" ? item.quantidade + qtd : item.quantidade - qtd
+    const novaQuantidade =
+      tipo === "entrada" ? item.quantidade + qtd : item.quantidade - qtd
 
-        const novoHistorico = [
-          {
-            usuario: usuarioLogado.nome,
-            tipo,
-            quantidade: qtd,
-            comentario,
-            data: new Date().toLocaleString("pt-BR"),
-          },
-          ...item.historico,
-        ]
+    if (novaQuantidade < 0) {
+      alert("Quantidade insuficiente em estoque")
+      return
+    }
 
-        return {
-          ...item,
-          quantidade: novaQuantidade,
-          historico: novoHistorico,
-        }
-      })
-    )
+    const { error: updateError } = await supabase
+      .from("itens")
+      .update({ quantidade: novaQuantidade })
+      .eq("id", itemId)
+
+    if (updateError) {
+      console.error("Erro ao atualizar item:", updateError)
+      alert("Erro ao atualizar quantidade")
+      return
+    }
+
+    const { error: historicoError } = await supabase
+      .from("historico")
+      .insert([
+        {
+          item_id: itemId,
+          usuario: usuarioLogado.nome,
+          tipo,
+          quantidade: qtd,
+          comentario,
+          data: new Date().toLocaleString("pt-BR"),
+        },
+      ])
+
+    if (historicoError) {
+      console.error("Erro ao salvar histórico:", historicoError)
+      alert("Erro ao registrar histórico")
+      return
+    }
+
+    await carregarItens()
   }
 
-  function removerHistorico(itemId, indexHistorico) {
+  async function removerHistorico(itemId, indexHistorico) {
     if (usuarioLogado.perfil !== "admin") {
       alert("Somente admin pode excluir registros do histórico")
       return
     }
 
-    setItens((listaAtual) => {
-      return listaAtual.map((item) => {
-        if (item.id !== itemId) return item
+    const item = itens.find((i) => i.id === itemId)
+    if (!item) return
 
-        const novoHistorico = [...item.historico]
-        novoHistorico.splice(indexHistorico, 1)
+    const registro = item.historico[indexHistorico]
+    if (!registro) return
 
-        return {
-          ...item,
-          historico: novoHistorico,
-        }
-      })
-    })
+    const { error } = await supabase
+      .from("historico")
+      .delete()
+      .eq("id", registro.id)
+
+    if (error) {
+      console.error("Erro ao remover histórico:", error)
+      alert("Erro ao remover histórico")
+      return
+    }
+
+    await carregarItens()
   }
 
-  function removerItem(itemId) {
+  async function removerItem(itemId) {
     if (usuarioLogado.perfil !== "admin") {
       alert("Somente admin pode excluir itens")
       return
@@ -146,31 +184,74 @@ function App() {
     const confirmar = window.confirm("Deseja realmente excluir este item do sistema?")
     if (!confirmar) return
 
-    setItens((listaAtual) => listaAtual.filter((item) => item.id !== itemId))
+    const { error: historicoError } = await supabase
+      .from("historico")
+      .delete()
+      .eq("item_id", itemId)
+
+    if (historicoError) {
+      console.error("Erro ao excluir histórico do item:", historicoError)
+      alert("Erro ao excluir histórico do item")
+      return
+    }
+
+    const { error: itemError } = await supabase
+      .from("itens")
+      .delete()
+      .eq("id", itemId)
+
+    if (itemError) {
+      console.error("Erro ao excluir item:", itemError)
+      alert("Erro ao excluir item")
+      return
+    }
+
     setItemSelecionadoId(null)
     setModoTela("dashboard")
+    await carregarItens()
   }
 
-  function adicionarItem(novoItem) {
-    const item = {
-      id: Date.now(),
-      codigo: novoItem.codigo,
-      nome: novoItem.nome,
-      local: novoItem.local,
-      quantidade: Number(novoItem.quantidade),
-      historico: [
+  async function adicionarItem(novoItem) {
+    const { data: itemCriado, error: itemError } = await supabase
+      .from("itens")
+      .insert([
         {
+          codigo: novoItem.codigo,
+          nome: novoItem.nome,
+          local: novoItem.local,
+          quantidade: Number(novoItem.quantidade),
+        },
+      ])
+      .select()
+      .single()
+
+    if (itemError) {
+      console.error("Erro ao adicionar item:", itemError)
+      alert("Erro ao adicionar item")
+      return
+    }
+
+    const { error: historicoError } = await supabase
+      .from("historico")
+      .insert([
+        {
+          item_id: itemCriado.id,
           usuario: usuarioLogado.nome,
           tipo: "entrada",
           quantidade: Number(novoItem.quantidade),
           comentario: "Cadastro inicial do item",
           data: new Date().toLocaleString("pt-BR"),
         },
-      ],
+      ])
+
+    if (historicoError) {
+      console.error("Erro ao salvar histórico inicial:", historicoError)
+      alert("Erro ao salvar histórico inicial")
+      return
     }
 
-    setItens((listaAtual) => [item, ...listaAtual])
     setModoTela("dashboard")
+    await carregarItens()
   }
 
   function abrirItem(id) {
@@ -189,8 +270,17 @@ function App() {
     setModoTela("dashboard")
   }
 
+  if (carregando) {
+    return <div style={{ padding: "20px" }}>Carregando...</div>
+  }
+
   if (!usuarioLogado) {
-    return <Login onLogin={setUsuarioLogado} />
+    return (
+      <Login
+        onLogin={setUsuarioLogado}
+        usuarios={usuarios}
+      />
+    )
   }
 
   if (modoTela === "admin-usuarios") {
