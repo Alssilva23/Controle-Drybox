@@ -1,91 +1,136 @@
-import { useState, useEffect } from "react"
-import Login from "./pages/Login.jsx"
-import Dashboard from "./pages/Dashboard.jsx"
-import ItemDetalhe from "./pages/ItemDetalhe.jsx"
-import NovoItem from "./pages/NovoItem.jsx"
-import AdminUsuarios from "./pages/AdminUsuarios.jsx"
-import usuariosPadrao from "./data/usuarios.js"
-import { supabase } from "./supabase.js"
+import { useState } from "react"
 
-function App() {
-  const [usuarioLogado, setUsuarioLogado] = useState(null)
-  const [modoTela, setModoTela] = useState("dashboard")
-  const [itemSelecionadoId, setItemSelecionadoId] = useState(null)
-  const [usuarios, setUsuarios] = useState([])
-  const [itens, setItens] = useState([])
-  const [carregando, setCarregando] = useState(true)
+function Login({ onLogin, usuarios = [] }) {
+  const [usuario, setUsuario] = useState("")
+  const [senha, setSenha] = useState("")
 
-  async function carregarUsuarios() {
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select("*")
-      .order("id", { ascending: true })
+  function entrar(e) {
+    if (e) e.preventDefault()
 
-    if (error) {
-      alert("ERRO SUPABASE: " + error.message)
+    const loginDigitado = usuario.trim().toLowerCase()
+    const senhaDigitada = senha.trim()
+
+    if (!loginDigitado || !senhaDigitada) {
+      alert("Preencha usuário e senha")
       return
     }
 
-    if (!data || data.length === 0) {
-      const usuariosParaInserir = usuariosPadrao.map((u) => ({
-        nome: u.nome,
-        usuario: u.usuario,
-        senha: u.senha,
-        perfil: u.perfil,
-      }))
+    const usuarioEncontrado = usuarios.find((u) => {
+      const usuarioBanco = String(u.usuario || "").trim().toLowerCase()
+      const nomeBanco = String(u.nome || "").trim().toLowerCase()
+      const senhaBanco = String(u.senha || "").trim()
 
-      await supabase.from("usuarios").insert(usuariosParaInserir)
+      return (
+        (usuarioBanco === loginDigitado || nomeBanco === loginDigitado) &&
+        senhaBanco === senhaDigitada
+      )
+    })
 
-      const { data: novosUsuarios } = await supabase
-        .from("usuarios")
-        .select("*")
-
-      setUsuarios(novosUsuarios || [])
+    if (!usuarioEncontrado) {
+      alert(`Usuário ou senha inválidos. Usuários carregados: ${usuarios.length}`)
       return
     }
 
-    setUsuarios(data)
-  }
-
-  async function carregarItens() {
-    const { data } = await supabase
-      .from("itens")
-      .select("*")
-
-    setItens(data || [])
-  }
-
-  async function carregarDados() {
-    setCarregando(true)
-    await carregarUsuarios()
-    await carregarItens()
-    setCarregando(false)
-  }
-
-  useEffect(() => {
-    carregarDados()
-  }, [])
-
-  function sair() {
-    setUsuarioLogado(null)
-  }
-
-  if (carregando) return <div>Carregando...</div>
-
-  if (!usuarioLogado) {
-    return <Login onLogin={setUsuarioLogado} usuarios={usuarios} />
+    onLogin(usuarioEncontrado)
   }
 
   return (
-    <Dashboard
-      usuario={usuarioLogado}
-      itens={itens}
-      aoSelecionarItem={() => {}}
-      aoNovoItem={() => {}}
-      aoAbrirAdmin={() => {}}
-      aoSair={sair}
-    />
+    <div
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "#f3f4f6",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px",
+        boxSizing: "border-box",
+      }}
+    >
+      <form
+        onSubmit={entrar}
+        style={{
+          width: "100%",
+          maxWidth: "420px",
+          background: "#fff",
+          borderRadius: "16px",
+          padding: "32px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+          boxSizing: "border-box",
+        }}
+      >
+        <h1 style={{ color: "#22c55e", margin: 0, fontSize: "42px" }}>
+          Intelbras
+        </h1>
+
+        <h2 style={{ marginTop: "8px", marginBottom: "8px" }}>
+          Técnico de Reparo
+        </h2>
+
+        <p style={{ color: "#6b7280", marginBottom: "24px" }}>
+          Insira suas credenciais para gerenciar o inventário DryBox
+        </p>
+
+        <p style={{ color: "#6b7280", marginBottom: "12px", fontSize: "14px" }}>
+          Usuários carregados: {usuarios.length}
+        </p>
+
+        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
+          Usuário
+        </label>
+
+        <input
+          type="text"
+          value={usuario}
+          onChange={(e) => setUsuario(e.target.value)}
+          placeholder="Digite seu usuário"
+          style={{
+            width: "100%",
+            padding: "14px",
+            borderRadius: "10px",
+            border: "1px solid #d1d5db",
+            marginBottom: "18px",
+            boxSizing: "border-box",
+          }}
+        />
+
+        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
+          Senha
+        </label>
+
+        <input
+          type="password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          placeholder="Digite sua senha"
+          style={{
+            width: "100%",
+            padding: "14px",
+            borderRadius: "10px",
+            border: "1px solid #d1d5db",
+            marginBottom: "20px",
+            boxSizing: "border-box",
+          }}
+        />
+
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            background: "#22c55e",
+            color: "white",
+            border: "none",
+            padding: "14px",
+            borderRadius: "10px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          Entrar
+        </button>
+      </form>
+    </div>
   )
 }
 
-export default App
+export default Login
