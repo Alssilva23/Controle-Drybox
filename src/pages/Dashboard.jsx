@@ -1,26 +1,23 @@
 import { useState } from "react"
 
 function Dashboard({
-  usuario = {},
-  itens = [],
+  usuario,
+  itens,
   aoSelecionarItem,
   aoNovoItem,
   aoAbrirAdmin,
   aoSair,
 }) {
   const [busca, setBusca] = useState("")
+  const [linhaHover, setLinhaHover] = useState(null)
 
   const itensFiltrados = itens.filter((item) => {
-    const termo = busca.trim().toLowerCase()
-
-    const codigo = String(item.codigo || "").toLowerCase()
-    const nome = String(item.nome || "").toLowerCase()
-    const local = String(item.local || "").toLowerCase()
+    const termo = busca.toLowerCase()
 
     return (
-      codigo.includes(termo) ||
-      nome.includes(termo) ||
-      local.includes(termo)
+      String(item.codigo || "").toLowerCase().includes(termo) ||
+      String(item.nome || "").toLowerCase().includes(termo) ||
+      String(item.local || "").toLowerCase().includes(termo)
     )
   })
 
@@ -41,9 +38,17 @@ function Dashboard({
         <head>
           <title>Lista DryBox</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 30px; }
-            h1 { margin-bottom: 20px; }
-            .linha { padding: 8px 0; border-bottom: 1px solid #ddd; }
+            body {
+              font-family: Arial, sans-serif;
+              padding: 30px;
+            }
+            h1 {
+              margin-bottom: 20px;
+            }
+            .linha {
+              padding: 8px 0;
+              border-bottom: 1px solid #ddd;
+            }
           </style>
         </head>
         <body>
@@ -52,7 +57,7 @@ function Dashboard({
             .map(
               (item) => `
                 <div class="linha">
-                  <strong>${item.codigo ?? ""}</strong> | ${item.nome ?? ""} | ${item.local ?? ""} | ${item.quantidade ?? 0}
+                  <strong>${item.codigo}</strong> | ${item.nome} | ${item.local} | ${item.quantidade}
                 </div>
               `
             )
@@ -62,46 +67,29 @@ function Dashboard({
     `)
 
     janela.document.close()
-    janela.focus()
     janela.print()
   }
 
   function abrirAdministracao() {
-    if (usuario?.perfil !== "admin") {
+    if (String(usuario?.perfil || "").trim().toLowerCase() !== "admin") {
       alert("Somente admin pode acessar essa área")
       return
     }
 
-    if (typeof aoAbrirAdmin === "function") {
-      aoAbrirAdmin()
-    }
+    aoAbrirAdmin()
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        width: "100%",
-        background: "#f3f4f6",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          minHeight: "100vh",
-          width: "100%",
-        }}
-      >
+    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial" }}>
+      <div style={{ display: "flex" }}>
         <div
           style={{
             width: "260px",
-            minHeight: "100vh",
             background: "#ffffff",
             borderRight: "1px solid #e5e7eb",
+            minHeight: "100vh",
             padding: "24px",
             boxSizing: "border-box",
-            flexShrink: 0,
           }}
         >
           <h2 style={{ margin: 0, color: "#16a34a" }}>DryBox</h2>
@@ -115,15 +103,12 @@ function Dashboard({
               borderRadius: "10px",
             }}
           >
-            <div style={{ fontWeight: "bold", color: "#111827" }}>
-              {usuario?.nome || "Usuário"}
-            </div>
+            <div style={{ fontWeight: "bold", color: "#111827" }}>{usuario?.nome}</div>
             <div style={{ color: "#6b7280", fontSize: "14px", marginTop: "4px" }}>
-              Perfil: {usuario?.perfil || "-"}
+              Perfil: {usuario?.perfil}
             </div>
 
             <button
-              type="button"
               onClick={aoSair}
               style={{
                 marginTop: "12px",
@@ -153,34 +138,23 @@ function Dashboard({
               Controle de Componentes
             </div>
 
-            <button
-              type="button"
+            <div
               onClick={abrirAdministracao}
               style={{
-                width: "100%",
                 padding: "12px",
                 borderRadius: "10px",
                 color: "#374151",
                 marginBottom: "10px",
                 background: "#f9fafb",
                 cursor: "pointer",
-                border: "none",
-                textAlign: "left",
               }}
             >
               Administração
-            </button>
+            </div>
           </div>
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            padding: "30px",
-            boxSizing: "border-box",
-            width: "100%",
-          }}
-        >
+        <div style={{ flex: 1, padding: "30px" }}>
           <div style={{ marginBottom: "24px" }}>
             <h1
               style={{
@@ -190,7 +164,7 @@ function Dashboard({
                 color: "#111827",
               }}
             >
-              Bem-vindo, {usuario?.nome || "Usuário"}
+              Bem-vindo, {usuario?.nome}
             </h1>
 
             <p
@@ -212,17 +186,38 @@ function Dashboard({
               marginBottom: "24px",
             }}
           >
-            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
+            <div
+              style={{
+                background: "white",
+                borderRadius: "14px",
+                padding: "20px",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+              }}
+            >
               <p style={{ color: "#6b7280", marginTop: 0 }}>Total de Itens</p>
               <h2>{totalItens}</h2>
             </div>
 
-            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
+            <div
+              style={{
+                background: "white",
+                borderRadius: "14px",
+                padding: "20px",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+              }}
+            >
               <p style={{ color: "#6b7280", marginTop: 0 }}>Peças em Estoque</p>
               <h2>{totalPecas}</h2>
             </div>
 
-            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
+            <div
+              style={{
+                background: "white",
+                borderRadius: "14px",
+                padding: "20px",
+                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+              }}
+            >
               <p style={{ color: "#6b7280", marginTop: 0 }}>Itens Esgotados</p>
               <h2 style={{ color: "#dc2626" }}>{esgotados}</h2>
             </div>
@@ -291,7 +286,7 @@ function Dashboard({
                   top: "50%",
                   transform: "translateY(-50%)",
                   color: "#6b7280",
-                  pointerEvents: "none",
+                  fontSize: "16px",
                 }}
               >
                 🔍
@@ -309,6 +304,8 @@ function Dashboard({
                   border: "1px solid #d1d5db",
                   boxSizing: "border-box",
                   fontSize: "15px",
+                  background: "white",
+                  color: "#111827",
                 }}
               />
             </div>
@@ -326,7 +323,14 @@ function Dashboard({
               <tbody>
                 {itensFiltrados.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ padding: "20px", textAlign: "center", color: "#6b7280" }}>
+                    <td
+                      colSpan="4"
+                      style={{
+                        padding: "20px",
+                        textAlign: "center",
+                        color: "#6b7280",
+                      }}
+                    >
                       Nenhum componente encontrado.
                     </td>
                   </tr>
@@ -335,11 +339,23 @@ function Dashboard({
                     <tr
                       key={item.id}
                       onClick={() => aoSelecionarItem(item.id)}
-                      style={{ cursor: "pointer" }}
+                      onMouseEnter={() => setLinhaHover(item.id)}
+                      onMouseLeave={() => setLinhaHover(null)}
+                      style={{
+                        cursor: "pointer",
+                        background: linhaHover === item.id ? "#f5f5f5" : "white",
+                        transition: "background 0.2s ease",
+                      }}
                     >
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.codigo}</td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.nome}</td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.local}</td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
+                        {item.codigo}
+                      </td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
+                        {item.nome}
+                      </td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
+                        {item.local}
+                      </td>
                       <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
                         {Number(item.quantidade || 0) === 0 ? (
                           <span style={{ color: "#dc2626", fontWeight: "bold" }}>Esgotado</span>
