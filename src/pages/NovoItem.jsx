@@ -6,20 +6,18 @@ function NovoItem({ voltar, adicionarItem }) {
   const [local, setLocal] = useState("")
   const [quantidade, setQuantidade] = useState("")
 
-  function salvar() {
+  async function salvar() {
     if (!codigo || !nome || !local || quantidade === "") {
       alert("Preencha todos os campos")
       return
     }
 
-    adicionarItem({
+    await adicionarItem({
       codigo,
       nome,
       local,
       quantidade: Number(quantidade),
     })
-
-    voltar()
   }
 
   return (
