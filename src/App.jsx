@@ -14,7 +14,6 @@ function App() {
   const [itens, setItens] = useState([])
   const [carregando, setCarregando] = useState(true)
 
-  // 🔥 USUÁRIOS
   async function carregarUsuarios() {
     const { data, error } = await supabase.from("usuarios").select("*")
 
@@ -34,10 +33,8 @@ function App() {
     setUsuarios(data)
   }
 
-  // 🔥 ITENS + HISTÓRICO
   async function carregarItens() {
     const { data: itensData } = await supabase.from("itens").select("*")
-
     const { data: historicoData } = await supabase.from("historico").select("*")
 
     const itensComHistorico = (itensData || []).map((item) => ({
@@ -56,10 +53,45 @@ function App() {
   }
 
   useEffect(() => {
+    const usuarioSalvo = localStorage.getItem("drybox_usuario_logado")
+    const telaSalva = localStorage.getItem("drybox_modo_tela")
+    const itemSalvo = localStorage.getItem("drybox_item_selecionado")
+
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo))
+    }
+
+    if (telaSalva) {
+      setModoTela(telaSalva)
+    }
+
+    if (itemSalvo) {
+      setItemSelecionadoId(Number(itemSalvo))
+    }
+
     carregarDados()
   }, [])
 
-  // 🔥 REGISTRAR HISTÓRICO
+  useEffect(() => {
+    if (usuarioLogado) {
+      localStorage.setItem("drybox_usuario_logado", JSON.stringify(usuarioLogado))
+    } else {
+      localStorage.removeItem("drybox_usuario_logado")
+    }
+  }, [usuarioLogado])
+
+  useEffect(() => {
+    localStorage.setItem("drybox_modo_tela", modoTela)
+  }, [modoTela])
+
+  useEffect(() => {
+    if (itemSelecionadoId !== null) {
+      localStorage.setItem("drybox_item_selecionado", String(itemSelecionadoId))
+    } else {
+      localStorage.removeItem("drybox_item_selecionado")
+    }
+  }, [itemSelecionadoId])
+
   async function registrarMovimentacao(itemId, tipo, quantidade, comentario) {
     const qtd = Number(quantidade)
 
@@ -98,7 +130,6 @@ function App() {
     await carregarItens()
   }
 
-  // 🔥 REMOVER HISTÓRICO
   async function removerHistorico(itemId, indexHistorico) {
     const item = itens.find((i) => i.id === itemId)
     if (!item) return
@@ -107,20 +138,18 @@ function App() {
     if (!registro) return
 
     await supabase.from("historico").delete().eq("id", registro.id)
-
     await carregarItens()
   }
 
-  // 🔥 REMOVER ITEM
   async function removerItem(itemId) {
     await supabase.from("historico").delete().eq("item_id", itemId)
     await supabase.from("itens").delete().eq("id", itemId)
 
     setModoTela("dashboard")
+    setItemSelecionadoId(null)
     await carregarItens()
   }
 
-  // 🔥 NOVO ITEM
   async function adicionarItem(novoItem) {
     await supabase.from("itens").insert([
       {
@@ -148,12 +177,24 @@ function App() {
   function sair() {
     setUsuarioLogado(null)
     setModoTela("dashboard")
+    setItemSelecionadoId(null)
+    localStorage.removeItem("drybox_usuario_logado")
+    localStorage.removeItem("drybox_modo_tela")
+    localStorage.removeItem("drybox_item_selecionado")
   }
 
   if (carregando) return <div>Carregando...</div>
 
   if (!usuarioLogado) {
-    return <Login onLogin={setUsuarioLogado} usuarios={usuarios} />
+    return (
+      <Login
+        onLogin={(usuario) => {
+          setUsuarioLogado(usuario)
+          setModoTela("dashboard")
+        }}
+        usuarios={usuarios}
+      />
+    )
   }
 
   if (modoTela === "admin-usuarios") {
@@ -168,9 +209,7 @@ function App() {
   }
 
   if (modoTela === "novo-item") {
-    return (
-      <NovoItem voltar={voltarDashboard} adicionarItem={adicionarItem} />
-    )
+    return <NovoItem voltar={voltarDashboard} adicionarItem={adicionarItem} />
   }
 
   if (modoTela === "item") {
