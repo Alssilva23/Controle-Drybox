@@ -14,8 +14,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
     }
 
     const usuarioJaExiste = usuarios.some(
-      (u) =>
-        String(u.usuario || "").toLowerCase() === usuario.toLowerCase()
+      (u) => String(u.usuario || "").toLowerCase() === usuario.toLowerCase()
     )
 
     if (usuarioJaExiste) {
@@ -94,18 +93,38 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-        
-        {/* CADASTRO */}
         <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
           <h2>Cadastrar Usuário</h2>
 
-          <input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} style={inputStyle} />
-          <input placeholder="Usuário" value={usuario} onChange={(e) => setUsuario(e.target.value)} style={inputStyle} />
-          <input placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} style={inputStyle} />
+          <input
+            placeholder="Nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            style={inputStyle}
+          />
 
-          <select value={perfil} onChange={(e) => setPerfil(e.target.value)} style={inputStyle}>
+          <input
+            placeholder="Usuário"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+            style={inputStyle}
+          />
+
+          <input
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            style={inputStyle}
+          />
+
+          <select
+            value={perfil}
+            onChange={(e) => setPerfil(e.target.value)}
+            style={inputStyle}
+          >
             <option value="tecnico">Técnico</option>
             <option value="lider">Líder</option>
+            <option value="operador">Operador</option>
             <option value="admin">Admin</option>
           </select>
 
@@ -114,7 +133,6 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
           </button>
         </div>
 
-        {/* LISTA */}
         <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
           <h2>Usuários Cadastrados</h2>
 
@@ -122,10 +140,22 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             <p style={{ color: "#6b7280" }}>Nenhum usuário cadastrado.</p>
           ) : (
             usuarios.map((u) => (
-              <div key={u.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+              <div
+                key={u.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "10px",
+                  paddingBottom: "10px",
+                  borderBottom: "1px solid #e5e7eb",
+                }}
+              >
                 <div>
-                  <strong>{u.nome}</strong><br />
-                  <small>{u.usuario} | {u.perfil}</small>
+                  <strong>{u.nome}</strong>
+                  <br />
+                  <small>
+                    {u.usuario} | {u.perfil}
+                  </small>
                 </div>
 
                 <button onClick={() => excluirUsuario(u.id)} style={btnRed}>
@@ -135,7 +165,6 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             ))
           )}
         </div>
-
       </div>
     </div>
   )
@@ -147,6 +176,7 @@ const inputStyle = {
   marginBottom: "10px",
   borderRadius: "8px",
   border: "1px solid #d1d5db",
+  boxSizing: "border-box",
 }
 
 const btnGreen = {
