@@ -10,14 +10,20 @@ function Login({ onLogin, usuarios = [] }) {
       return
     }
 
+    const loginDigitado = usuario.trim().toLowerCase()
+    const senhaDigitada = senha.trim()
+
     const usuarioEncontrado = usuarios.find(
       (u) =>
-        (u.usuario === usuario || u.nome === usuario) &&
-        u.senha === senha
+        (
+          String(u.usuario || "").trim().toLowerCase() === loginDigitado ||
+          String(u.nome || "").trim().toLowerCase() === loginDigitado
+        ) &&
+        String(u.senha || "").trim() === senhaDigitada
     )
 
     if (!usuarioEncontrado) {
-      alert("Usuário ou senha inválidos")
+      alert(`Usuário ou senha inválidos. Usuários carregados: ${usuarios.length}`)
       return
     }
 
@@ -37,6 +43,10 @@ function Login({ onLogin, usuarios = [] }) {
 
         <p style={{ color: "#6b7280", marginBottom: "24px" }}>
           Insira suas credenciais para gerenciar o inventário DryBox
+        </p>
+
+        <p style={{ color: "#6b7280", marginBottom: "12px", fontSize: "14px" }}>
+          Usuários carregados: {usuarios.length}
         </p>
 
         <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
