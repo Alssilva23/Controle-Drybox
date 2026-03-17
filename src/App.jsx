@@ -14,79 +14,38 @@ function App() {
   const [itens, setItens] = useState([])
   const [carregando, setCarregando] = useState(true)
 
-  // ✅ CARREGAR USUÁRIOS
+  // 🔥 USUÁRIOS
   async function carregarUsuarios() {
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select("*")
-      .order("id", { ascending: true })
+    const { data, error } = await supabase.from("usuarios").select("*")
 
-    if (error) {
-      console.error("Erro ao carregar usuários:", error)
-
-      // fallback local
-      setUsuarios([
-        {
-          id: 1,
-          nome: "Alessandra",
-          usuario: "alessandra",
-          senha: "123",
-          perfil: "admin",
-        },
-        {
-          id: 2,
-          nome: "Carlos",
-          usuario: "carlos",
-          senha: "123",
-          perfil: "tecnico",
-        },
-      ])
-      return
-    }
-
-    // 🔥 SE BANCO ESTIVER VAZIO
-    if (!data || data.length === 0) {
-      const usuariosPadrao = [
-        {
-          nome: "Alessandra",
-          usuario: "alessandra",
-          senha: "123",
-          perfil: "admin",
-        },
-        {
-          nome: "Carlos",
-          usuario: "carlos",
-          senha: "123",
-          perfil: "tecnico",
-        },
+    if (error || !data || data.length === 0) {
+      const padrao = [
+        { nome: "Alessandra", usuario: "alessandra", senha: "123", perfil: "admin" },
+        { nome: "Carlos", usuario: "carlos", senha: "123", perfil: "tecnico" },
       ]
 
-      await supabase.from("usuarios").insert(usuariosPadrao)
+      await supabase.from("usuarios").insert(padrao)
 
-      const { data: novosUsuarios } = await supabase
-        .from("usuarios")
-        .select("*")
-
-      setUsuarios(novosUsuarios || [])
+      const { data: novos } = await supabase.from("usuarios").select("*")
+      setUsuarios(novos || [])
       return
     }
 
     setUsuarios(data)
   }
 
-  // ✅ CARREGAR ITENS
+  // 🔥 ITENS + HISTÓRICO
   async function carregarItens() {
-    const { data, error } = await supabase
-      .from("itens")
-      .select("*")
-      .order("id", { ascending: false })
+    const { data: itensData } = await supabase.from("itens").select("*")
 
-    if (error) {
-      console.error("Erro ao carregar itens:", error)
-      return
-    }
+    const { data: historicoData } = await supabase.from("historico").select("*")
 
-    setItens(data || [])
+    const itensComHistorico = (itensData || []).map((item) => ({
+      ...item,
+      historico: (historicoData || []).filter((h) => h.item_id === item.id),
+    }))
+
+    setItens(itensComHistorico)
   }
 
   async function carregarDados() {
@@ -100,24 +59,70 @@ function App() {
     carregarDados()
   }, [])
 
-  function abrirItem(id) {
-    setItemSelecionadoId(id)
-    setModoTela("item")
+  // 🔥 REGISTRAR HISTÓRICO
+  async function registrarMovimentacao(itemId, tipo, quantidade, comentario) {
+    const qtd = Number(quantidade)
+
+    if (!qtd || qtd <= 0) {
+      alert("Quantidade inválida")
+      return
+    }
+
+    const item = itens.find((i) => i.id === itemId)
+    if (!item) return
+
+    const novaQuantidade =
+      tipo === "entrada" ? item.quantidade + qtd : item.quantidade - qtd
+
+    if (novaQuantidade < 0) {
+      alert("Estoque insuficiente")
+      return
+    }
+
+    await supabase
+      .from("itens")
+      .update({ quantidade: novaQuantidade })
+      .eq("id", itemId)
+
+    await supabase.from("historico").insert([
+      {
+        item_id: itemId,
+        usuario: usuarioLogado.nome,
+        tipo,
+        quantidade: qtd,
+        comentario,
+        data: new Date().toLocaleString("pt-BR"),
+      },
+    ])
+
+    await carregarItens()
   }
 
-  function voltarDashboard() {
-    setItemSelecionadoId(null)
+  // 🔥 REMOVER HISTÓRICO
+  async function removerHistorico(itemId, indexHistorico) {
+    const item = itens.find((i) => i.id === itemId)
+    if (!item) return
+
+    const registro = item.historico[indexHistorico]
+    if (!registro) return
+
+    await supabase.from("historico").delete().eq("id", registro.id)
+
+    await carregarItens()
+  }
+
+  // 🔥 REMOVER ITEM
+  async function removerItem(itemId) {
+    await supabase.from("historico").delete().eq("item_id", itemId)
+    await supabase.from("itens").delete().eq("id", itemId)
+
     setModoTela("dashboard")
+    await carregarItens()
   }
 
-  function sair() {
-    setUsuarioLogado(null)
-    setModoTela("dashboard")
-    setItemSelecionadoId(null)
-  }
-
+  // 🔥 NOVO ITEM
   async function adicionarItem(novoItem) {
-    const { error } = await supabase.from("itens").insert([
+    await supabase.from("itens").insert([
       {
         codigo: novoItem.codigo,
         nome: novoItem.nome,
@@ -126,18 +131,26 @@ function App() {
       },
     ])
 
-    if (error) {
-      alert("Erro ao adicionar item")
-      return
-    }
-
     setModoTela("dashboard")
     await carregarItens()
   }
 
-  if (carregando) {
-    return <div style={{ padding: "20px" }}>Carregando...</div>
+  function abrirItem(id) {
+    setItemSelecionadoId(id)
+    setModoTela("item")
   }
+
+  function voltarDashboard() {
+    setModoTela("dashboard")
+    setItemSelecionadoId(null)
+  }
+
+  function sair() {
+    setUsuarioLogado(null)
+    setModoTela("dashboard")
+  }
+
+  if (carregando) return <div>Carregando...</div>
 
   if (!usuarioLogado) {
     return <Login onLogin={setUsuarioLogado} usuarios={usuarios} />
@@ -156,10 +169,7 @@ function App() {
 
   if (modoTela === "novo-item") {
     return (
-      <NovoItem
-        voltar={voltarDashboard}
-        adicionarItem={adicionarItem}
-      />
+      <NovoItem voltar={voltarDashboard} adicionarItem={adicionarItem} />
     )
   }
 
@@ -170,7 +180,10 @@ function App() {
       <ItemDetalhe
         item={itemSelecionado}
         voltar={voltarDashboard}
+        registrarMovimentacao={registrarMovimentacao}
         usuario={usuarioLogado}
+        removerHistorico={removerHistorico}
+        removerItem={removerItem}
       />
     )
   }
