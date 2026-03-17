@@ -13,7 +13,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
     }
 
     const usuarioJaExiste = usuarios.some(
-      (u) => u.usuario.toLowerCase() === usuario.toLowerCase()
+      (u) => String(u.usuario || "").toLowerCase() === usuario.toLowerCase()
     )
 
     if (usuarioJaExiste) {
@@ -35,6 +35,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
     setUsuario("")
     setSenha("")
     setPerfil("tecnico")
+    alert("Usuário cadastrado com sucesso")
   }
 
   function excluirUsuario(id) {
@@ -48,14 +49,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f3f4f6",
-        fontFamily: "Arial",
-        padding: "30px",
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial", padding: "30px" }}>
       <button
         onClick={voltar}
         style={{
@@ -70,15 +64,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
         ← Voltar
       </button>
 
-      <div
-        style={{
-          background: "white",
-          borderRadius: "14px",
-          padding: "24px",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-          marginBottom: "20px",
-        }}
-      >
+      <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)", marginBottom: "20px" }}>
         <h1 style={{ marginTop: 0 }}>Administração de Usuários</h1>
         <p style={{ color: "#6b7280", marginBottom: 0 }}>
           Apenas admin pode cadastrar e excluir usuários.
@@ -86,14 +72,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-        <div
-          style={{
-            background: "white",
-            borderRadius: "14px",
-            padding: "24px",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-          }}
-        >
+        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
           <h2 style={{ marginTop: 0 }}>Cadastrar Usuário</h2>
 
           <p style={{ marginBottom: "8px" }}>Nome</p>
@@ -101,14 +80,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             type="text"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              marginBottom: "16px",
-              boxSizing: "border-box",
-            }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", boxSizing: "border-box" }}
           />
 
           <p style={{ marginBottom: "8px" }}>Usuário</p>
@@ -116,14 +88,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             type="text"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              marginBottom: "16px",
-              boxSizing: "border-box",
-            }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", boxSizing: "border-box" }}
           />
 
           <p style={{ marginBottom: "8px" }}>Senha</p>
@@ -131,28 +96,14 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             type="text"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              marginBottom: "16px",
-              boxSizing: "border-box",
-            }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "16px", boxSizing: "border-box" }}
           />
 
           <p style={{ marginBottom: "8px" }}>Perfil</p>
           <select
             value={perfil}
             onChange={(e) => setPerfil(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              marginBottom: "20px",
-              boxSizing: "border-box",
-            }}
+            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #d1d5db", marginBottom: "20px", boxSizing: "border-box" }}
           >
             <option value="tecnico">Técnico</option>
             <option value="lider">Líder</option>
@@ -176,14 +127,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
           </button>
         </div>
 
-        <div
-          style={{
-            background: "white",
-            borderRadius: "14px",
-            padding: "24px",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-          }}
-        >
+        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
           <h2 style={{ marginTop: 0 }}>Usuários Cadastrados</h2>
 
           {usuarios.length === 0 ? (
