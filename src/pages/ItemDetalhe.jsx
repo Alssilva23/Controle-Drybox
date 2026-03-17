@@ -12,18 +12,18 @@ function ItemDetalhe({
   const [quantidade, setQuantidade] = useState(1)
   const [comentario, setComentario] = useState("")
 
-  function salvar() {
+  async function salvar() {
     if (!comentario.trim()) {
       alert("Informe o motivo da movimentação. Ex: Sobra ordem 1563")
       return
     }
 
-    registrarMovimentacao(item.id, tipo, quantidade, comentario)
+    await registrarMovimentacao(item.id, tipo, quantidade, comentario)
     setQuantidade(1)
     setComentario("")
   }
 
-  function excluirRegistro(index) {
+  async function excluirRegistro(index) {
     if (!removerHistorico) return
 
     if (usuario?.perfil !== "admin") {
@@ -34,10 +34,10 @@ function ItemDetalhe({
     const confirmar = window.confirm("Deseja realmente excluir este registro?")
     if (!confirmar) return
 
-    removerHistorico(item.id, index)
+    await removerHistorico(item.id, index)
   }
 
-  function excluirItem() {
+  async function excluirItem() {
     if (!removerItem) return
 
     if (usuario?.perfil !== "admin") {
@@ -45,7 +45,7 @@ function ItemDetalhe({
       return
     }
 
-    removerItem(item.id)
+    await removerItem(item.id)
   }
 
   return (
