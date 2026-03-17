@@ -23,7 +23,6 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       return
     }
 
-    // 🔥 SALVA NO SUPABASE
     const { data, error } = await supabase
       .from("usuarios")
       .insert([
@@ -38,12 +37,10 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       .single()
 
     if (error) {
-      console.error(error)
       alert("Erro ao salvar usuário")
       return
     }
 
-    // atualiza tela
     salvarUsuarios([...usuarios, data])
 
     setNome("")
@@ -74,33 +71,101 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
   }
 
   return (
-    <div style={{ padding: "30px" }}>
-      <button onClick={voltar}>← Voltar</button>
+    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial", padding: "30px" }}>
+      <button
+        onClick={voltar}
+        style={{
+          marginBottom: "20px",
+          background: "#e5e7eb",
+          border: "none",
+          borderRadius: "8px",
+          padding: "10px 14px",
+          cursor: "pointer",
+        }}
+      >
+        ← Voltar
+      </button>
 
-      <h1>Administração de Usuários</h1>
+      <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)", marginBottom: "20px" }}>
+        <h1 style={{ marginTop: 0 }}>Administração de Usuários</h1>
+        <p style={{ color: "#6b7280" }}>
+          Apenas admin pode cadastrar e excluir usuários.
+        </p>
+      </div>
 
-      <input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-      <input placeholder="Usuário" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
-      <input placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        
+        {/* CADASTRO */}
+        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
+          <h2>Cadastrar Usuário</h2>
 
-      <select value={perfil} onChange={(e) => setPerfil(e.target.value)}>
-        <option value="tecnico">Técnico</option>
-        <option value="lider">Líder</option>
-        <option value="admin">Admin</option>
-      </select>
+          <input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} style={inputStyle} />
+          <input placeholder="Usuário" value={usuario} onChange={(e) => setUsuario(e.target.value)} style={inputStyle} />
+          <input placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} style={inputStyle} />
 
-      <button onClick={cadastrarUsuario}>Cadastrar</button>
+          <select value={perfil} onChange={(e) => setPerfil(e.target.value)} style={inputStyle}>
+            <option value="tecnico">Técnico</option>
+            <option value="lider">Líder</option>
+            <option value="admin">Admin</option>
+          </select>
 
-      <h2>Lista</h2>
-
-      {usuarios.map((u) => (
-        <div key={u.id}>
-          {u.nome} - {u.usuario}
-          <button onClick={() => excluirUsuario(u.id)}>Excluir</button>
+          <button onClick={cadastrarUsuario} style={btnGreen}>
+            Cadastrar Usuário
+          </button>
         </div>
-      ))}
+
+        {/* LISTA */}
+        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
+          <h2>Usuários Cadastrados</h2>
+
+          {usuarios.length === 0 ? (
+            <p style={{ color: "#6b7280" }}>Nenhum usuário cadastrado.</p>
+          ) : (
+            usuarios.map((u) => (
+              <div key={u.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                <div>
+                  <strong>{u.nome}</strong><br />
+                  <small>{u.usuario} | {u.perfil}</small>
+                </div>
+
+                <button onClick={() => excluirUsuario(u.id)} style={btnRed}>
+                  Excluir
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+      </div>
     </div>
   )
+}
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "10px",
+  borderRadius: "8px",
+  border: "1px solid #d1d5db",
+}
+
+const btnGreen = {
+  width: "100%",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  padding: "12px",
+  cursor: "pointer",
+}
+
+const btnRed = {
+  background: "#ef4444",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  padding: "6px 10px",
+  cursor: "pointer",
 }
 
 export default AdminUsuarios
