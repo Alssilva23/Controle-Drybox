@@ -25,13 +25,8 @@ function Dashboard({
   })
 
   const totalItens = itens.length
-  const totalPecas = itens.reduce(
-    (acc, item) => acc + Number(item.quantidade || 0),
-    0
-  )
-  const esgotados = itens.filter(
-    (item) => Number(item.quantidade || 0) === 0
-  ).length
+  const totalPecas = itens.reduce((acc, item) => acc + Number(item.quantidade || 0), 0)
+  const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
 
   function exportarLista() {
     const janela = window.open("", "", "width=900,height=700")
@@ -46,17 +41,9 @@ function Dashboard({
         <head>
           <title>Lista DryBox</title>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              padding: 30px;
-            }
-            h1 {
-              margin-bottom: 20px;
-            }
-            .linha {
-              padding: 8px 0;
-              border-bottom: 1px solid #ddd;
-            }
+            body { font-family: Arial, sans-serif; padding: 30px; }
+            h1 { margin-bottom: 20px; }
+            .linha { padding: 8px 0; border-bottom: 1px solid #ddd; }
           </style>
         </head>
         <body>
@@ -87,30 +74,6 @@ function Dashboard({
 
     if (typeof aoAbrirAdmin === "function") {
       aoAbrirAdmin()
-    } else {
-      alert("Função de administração não foi passada")
-    }
-  }
-
-  function novoItem() {
-    if (typeof aoNovoItem === "function") {
-      aoNovoItem()
-    } else {
-      alert("Função de novo item não foi passada")
-    }
-  }
-
-  function sair() {
-    if (typeof aoSair === "function") {
-      aoSair()
-    } else {
-      alert("Função de sair não foi passada")
-    }
-  }
-
-  function selecionarItem(id) {
-    if (typeof aoSelecionarItem === "function") {
-      aoSelecionarItem(id)
     }
   }
 
@@ -126,16 +89,16 @@ function Dashboard({
       <div
         style={{
           display: "flex",
-          width: "100%",
           minHeight: "100vh",
+          width: "100%",
         }}
       >
         <div
           style={{
             width: "260px",
+            minHeight: "100vh",
             background: "#ffffff",
             borderRight: "1px solid #e5e7eb",
-            minHeight: "100vh",
             padding: "24px",
             boxSizing: "border-box",
             flexShrink: 0,
@@ -155,14 +118,13 @@ function Dashboard({
             <div style={{ fontWeight: "bold", color: "#111827" }}>
               {usuario?.nome || "Usuário"}
             </div>
-
             <div style={{ color: "#6b7280", fontSize: "14px", marginTop: "4px" }}>
               Perfil: {usuario?.perfil || "-"}
             </div>
 
             <button
               type="button"
-              onClick={sair}
+              onClick={aoSair}
               style={{
                 marginTop: "12px",
                 width: "100%",
@@ -179,22 +141,17 @@ function Dashboard({
           </div>
 
           <div style={{ marginTop: "30px" }}>
-            <button
-              type="button"
+            <div
               style={{
-                width: "100%",
                 background: "#16a34a",
                 color: "white",
                 padding: "12px",
                 borderRadius: "10px",
                 marginBottom: "10px",
-                border: "none",
-                cursor: "default",
-                fontSize: "16px",
               }}
             >
               Controle de Componentes
-            </button>
+            </div>
 
             <button
               type="button"
@@ -208,7 +165,7 @@ function Dashboard({
                 background: "#f9fafb",
                 cursor: "pointer",
                 border: "none",
-                fontSize: "16px",
+                textAlign: "left",
               }}
             >
               Administração
@@ -255,38 +212,17 @@ function Dashboard({
               marginBottom: "24px",
             }}
           >
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
+            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
               <p style={{ color: "#6b7280", marginTop: 0 }}>Total de Itens</p>
               <h2>{totalItens}</h2>
             </div>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
+            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
               <p style={{ color: "#6b7280", marginTop: 0 }}>Peças em Estoque</p>
               <h2>{totalPecas}</h2>
             </div>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
+            <div style={{ background: "white", borderRadius: "14px", padding: "20px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
               <p style={{ color: "#6b7280", marginTop: 0 }}>Itens Esgotados</p>
               <h2 style={{ color: "#dc2626" }}>{esgotados}</h2>
             </div>
@@ -331,7 +267,7 @@ function Dashboard({
 
                 <button
                   type="button"
-                  onClick={novoItem}
+                  onClick={aoNovoItem}
                   style={{
                     background: "#16a34a",
                     color: "white",
@@ -355,7 +291,6 @@ function Dashboard({
                   top: "50%",
                   transform: "translateY(-50%)",
                   color: "#6b7280",
-                  fontSize: "16px",
                   pointerEvents: "none",
                 }}
               >
@@ -391,14 +326,7 @@ function Dashboard({
               <tbody>
                 {itensFiltrados.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={4}
-                      style={{
-                        padding: "20px",
-                        textAlign: "center",
-                        color: "#6b7280",
-                      }}
-                    >
+                    <td colSpan={4} style={{ padding: "20px", textAlign: "center", color: "#6b7280" }}>
                       Nenhum componente encontrado.
                     </td>
                   </tr>
@@ -406,23 +334,15 @@ function Dashboard({
                   itensFiltrados.map((item) => (
                     <tr
                       key={item.id}
-                      onClick={() => selecionarItem(item.id)}
+                      onClick={() => aoSelecionarItem(item.id)}
                       style={{ cursor: "pointer" }}
                     >
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.codigo}
-                      </td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.nome}
-                      </td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.local}
-                      </td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.codigo}</td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.nome}</td>
+                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>{item.local}</td>
                       <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
                         {Number(item.quantidade || 0) === 0 ? (
-                          <span style={{ color: "#dc2626", fontWeight: "bold" }}>
-                            Esgotado
-                          </span>
+                          <span style={{ color: "#dc2626", fontWeight: "bold" }}>Esgotado</span>
                         ) : (
                           item.quantidade
                         )}
