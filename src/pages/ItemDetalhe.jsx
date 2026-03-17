@@ -49,7 +49,15 @@ function ItemDetalhe({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial", padding: "30px" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f3f4f6",
+        fontFamily: "Arial",
+        padding: "30px",
+        boxSizing: "border-box",
+      }}
+    >
       <button
         onClick={voltar}
         style={{
@@ -114,13 +122,25 @@ function ItemDetalhe({
         )}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+      {/* Container horizontal: histórico e formulário */}
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          flexWrap: "wrap",
+        }}
+      >
+        {/* Histórico de Uso com scroll */}
         <div
           style={{
             background: "white",
             borderRadius: "14px",
             padding: "24px",
             boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+            flex: 1,
+            minWidth: "300px",
+            maxHeight: "500px",
+            overflowY: "auto",
           }}
         >
           <h2 style={{ marginTop: 0 }}>Histórico de Uso</h2>
@@ -152,9 +172,7 @@ function ItemDetalhe({
                   </div>
 
                   {mov.comentario && (
-                    <div style={{ color: "#6b7280", marginTop: "4px" }}>
-                      {mov.comentario}
-                    </div>
+                    <div style={{ color: "#6b7280", marginTop: "4px" }}>{mov.comentario}</div>
                   )}
                 </div>
 
@@ -179,12 +197,15 @@ function ItemDetalhe({
           )}
         </div>
 
+        {/* Registrar Movimentação */}
         <div
           style={{
             background: "white",
             borderRadius: "14px",
             padding: "24px",
             boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+            flex: 1,
+            minWidth: "300px",
           }}
         >
           <h2 style={{ marginTop: 0 }}>Registrar Movimentação</h2>
@@ -222,7 +243,6 @@ function ItemDetalhe({
           </div>
 
           <p style={{ marginBottom: "8px" }}>Quantidade</p>
-
           <input
             type="number"
             value={quantidade}
@@ -238,7 +258,6 @@ function ItemDetalhe({
           />
 
           <p style={{ marginBottom: "8px" }}>Comentário</p>
-
           <textarea
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
