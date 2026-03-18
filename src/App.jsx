@@ -7,33 +7,35 @@ import AdminUsuarios from "./pages/AdminUsuarios.jsx"
 import { supabase } from "./supabase.js"
 
 function App() {
-  // Guarda o usuário que está logado no sistema
+  // Usuário atualmente logado no sistema
   const [usuarioLogado, setUsuarioLogado] = useState(null)
 
-  // Controla qual tela está aberta no momento
-  // Pode ser: dashboard, item, novo-item, admin-usuarios
+  // Controla qual tela está sendo exibida
+  // Possíveis valores:
+  // "dashboard", "item", "novo-item", "admin-usuarios"
   const [modoTela, setModoTela] = useState("dashboard")
 
-  // Guarda o ID do item selecionado para abrir os detalhes dele
+  // Guarda o ID do item selecionado para abrir a tela de detalhes
   const [itemSelecionadoId, setItemSelecionadoId] = useState(null)
 
   // Lista de usuários cadastrados
   const [usuarios, setUsuarios] = useState([])
 
-  // Lista de itens com seus históricos
+  // Lista de itens do estoque com seus históricos
   const [itens, setItens] = useState([])
 
-  // Controla a tela de carregamento inicial
+  // Controla o estado de carregamento inicial da aplicação
   const [carregando, setCarregando] = useState(true)
 
   /**
-   * Carrega os usuários do banco.
-   * Se não existir nenhum usuário, cria usuários padrão.
+   * Carrega os usuários da tabela "usuarios" no Supabase.
+   *
+   * Se der erro ou a tabela estiver vazia, cria usuários padrão
+   * para garantir que o sistema tenha pelo menos um admin e um técnico.
    */
   async function carregarUsuarios() {
     const { data, error } = await supabase.from("usuarios").select("*")
 
-    // Se der erro ou a tabela estiver vazia, cria usuários padrão
     if (error || !data || data.length === 0) {
       const padrao = [
         { nome: "Alessandra", usuario: "alessandra", senha: "123", perfil: "admin" },
@@ -51,8 +53,10 @@ function App() {
   }
 
   /**
-   * Carrega todos os itens e também o histórico de movimentações.
-   * Depois junta os dois, deixando cada item com seu histórico.
+   * Carrega os itens e o histórico do banco.
+   *
+   * Depois junta os dados para que cada item fique com
+   * sua lista de movimentações associada.
    */
   async function carregarItens() {
     const { data: itensData } = await supabase.from("itens").select("*")
@@ -67,8 +71,12 @@ function App() {
   }
 
   /**
-   * Carrega todos os dados principais da aplicação.
-   * Usado na inicialização e quando for necessário atualizar tudo.
+   * Função central de carregamento inicial.
+   *
+   * Executa:
+   * 1. carregamento de usuários
+   * 2. carregamento de itens
+   * 3. controle do estado visual de carregamento
    */
   async function carregarDados() {
     setCarregando(true)
@@ -78,12 +86,14 @@ function App() {
   }
 
   /**
-   * Executa uma vez ao abrir o app.
-   * Recupera dados salvos no localStorage:
+   * Executa uma vez ao iniciar a aplicação.
+   *
+   * Recupera do localStorage:
    * - usuário logado
    * - tela atual
    * - item selecionado
-   * E depois carrega os dados do Supabase.
+   *
+   * Depois disso carrega os dados do Supabase.
    */
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem("drybox_usuario_logado")
@@ -107,7 +117,9 @@ function App() {
 
   /**
    * Sempre que o usuário logado mudar,
-   * salva ou remove do localStorage.
+   * salva o usuário no localStorage.
+   *
+   * Se não houver usuário, remove o registro salvo.
    */
   useEffect(() => {
     if (usuarioLogado) {
@@ -118,8 +130,8 @@ function App() {
   }, [usuarioLogado])
 
   /**
-   * Sempre que a tela mudar,
-   * salva a tela atual no localStorage.
+   * Sempre que a tela atual mudar,
+   * salva o modo de tela no localStorage.
    */
   useEffect(() => {
     localStorage.setItem("drybox_modo_tela", modoTela)
@@ -127,7 +139,9 @@ function App() {
 
   /**
    * Sempre que o item selecionado mudar,
-   * salva ou remove do localStorage.
+   * salva o ID no localStorage.
+   *
+   * Se nenhum item estiver selecionado, remove o valor salvo.
    */
   useEffect(() => {
     if (itemSelecionadoId !== null) {
@@ -138,40 +152,23 @@ function App() {
   }, [itemSelecionadoId])
 
   /**
-   * Converte uma movimentação em impacto numérico no estoque.
+   * Registra uma nova movimentação no histórico de um item.
    *
-   * Exemplo:
-   * entrada 5 => +5
-   * saída 5   => -5
-   *
-   * Isso ajuda principalmente na edição de uma movimentação,
-   * porque precisamos "desfazer" o efeito antigo e aplicar o novo.
-   */
-  function calcularEfeitoMovimentacao(tipo, quantidade) {
-    const qtd = Number(quantidade)
-
-    if (tipo === "entrada") {
-      return qtd
-    }
-
-    return -qtd
-  }
-
-  /**
-   * Registra uma nova movimentação no item.
+   * Regras:
+   * - a quantidade deve ser válida e maior que zero
+   * - se for saída, não pode deixar o estoque negativo
    *
    * Fluxo:
    * 1. valida a quantidade
-   * 2. encontra o item
-   * 3. calcula a nova quantidade em estoque
-   * 4. atualiza a tabela de itens
-   * 5. grava no histórico
+   * 2. encontra o item correspondente
+   * 3. calcula a nova quantidade do estoque
+   * 4. atualiza a tabela "itens"
+   * 5. grava a movimentação na tabela "historico"
    * 6. recarrega os itens para atualizar a tela
    */
   async function registrarMovimentacao(itemId, tipo, quantidade, comentario) {
     const qtd = Number(quantidade)
 
-    // Impede quantidade vazia, zero ou negativa
     if (!qtd || qtd <= 0) {
       alert("Quantidade inválida")
       return
@@ -180,29 +177,20 @@ function App() {
     const item = itens.find((i) => i.id === itemId)
     if (!item) return
 
-    // Se for entrada soma, se for saída subtrai
     const novaQuantidade =
       tipo === "entrada" ? item.quantidade + qtd : item.quantidade - qtd
 
-    // Não deixa o estoque ficar negativo
     if (novaQuantidade < 0) {
       alert("Estoque insuficiente")
       return
     }
 
-    // Atualiza a quantidade atual do item
-    const { error: erroItem } = await supabase
+    await supabase
       .from("itens")
       .update({ quantidade: novaQuantidade })
       .eq("id", itemId)
 
-    if (erroItem) {
-      alert("Erro ao atualizar quantidade do item")
-      return
-    }
-
-    // Grava o lançamento no histórico
-    const { error: erroHistorico } = await supabase.from("historico").insert([
+    await supabase.from("historico").insert([
       {
         item_id: itemId,
         usuario: usuarioLogado.nome,
@@ -213,105 +201,15 @@ function App() {
       },
     ])
 
-    if (erroHistorico) {
-      alert("Erro ao salvar histórico")
-      return
-    }
-
-    // Recarrega os itens para refletir na tela
     await carregarItens()
   }
 
   /**
-   * Edita uma movimentação já existente.
-   *
-   * Como funciona:
-   * 1. pega o registro antigo
-   * 2. remove o efeito antigo do estoque atual
-   * 3. aplica o novo efeito
-   * 4. atualiza o estoque do item
-   * 5. atualiza o histórico
-   *
-   * Exemplo:
-   * estoque atual: 10
-   * registro antigo: saída 2  => efeito antigo = -2
-   * sem o antigo: 10 - (-2) = 12
-   * novo registro: entrada 3 => efeito novo = +3
-   * resultado final: 12 + 3 = 15
-   */
-  async function editarMovimentacao(itemId, historicoId, novoTipo, novaQuantidade, novoComentario) {
-    const qtdNova = Number(novaQuantidade)
-
-    // Impede quantidade inválida
-    if (!qtdNova || qtdNova <= 0) {
-      alert("Quantidade inválida")
-      return
-    }
-
-    const item = itens.find((i) => i.id === itemId)
-    if (!item) return
-
-    const registroAntigo = item.historico.find((h) => h.id === historicoId)
-    if (!registroAntigo) return
-
-    // Calcula o efeito da movimentação antiga no estoque
-    const efeitoAntigo = calcularEfeitoMovimentacao(
-      registroAntigo.tipo,
-      registroAntigo.quantidade
-    )
-
-    // Calcula o efeito da nova movimentação editada
-    const efeitoNovo = calcularEfeitoMovimentacao(novoTipo, qtdNova)
-
-    // Remove o impacto antigo do estoque atual
-    const quantidadeBaseSemRegistroAntigo = item.quantidade - efeitoAntigo
-
-    // Aplica o novo impacto
-    const quantidadeFinal = quantidadeBaseSemRegistroAntigo + efeitoNovo
-
-    // Bloqueia se a edição deixar estoque negativo
-    if (quantidadeFinal < 0) {
-      alert("Estoque insuficiente para salvar essa edição")
-      return
-    }
-
-    // Atualiza a quantidade final do item
-    const { error: erroItem } = await supabase
-      .from("itens")
-      .update({ quantidade: quantidadeFinal })
-      .eq("id", itemId)
-
-    if (erroItem) {
-      alert("Erro ao atualizar quantidade do item")
-      return
-    }
-
-    // Atualiza o registro no histórico
-    const { error: erroHistorico } = await supabase
-      .from("historico")
-      .update({
-        tipo: novoTipo,
-        quantidade: qtdNova,
-        comentario: novoComentario,
-      })
-      .eq("id", historicoId)
-
-    if (erroHistorico) {
-      alert("Erro ao atualizar movimentação")
-      return
-    }
-
-    // Recarrega os itens para atualizar a tela
-    await carregarItens()
-  }
-
-  /**
-   * Remove um registro do histórico pelo índice visual.
+   * Remove um registro do histórico de um item.
    *
    * Observação:
-   * essa função apenas apaga o histórico.
-   * Se você quiser, depois eu posso ajustar para também
-   * devolver a quantidade ao estoque corretamente ao excluir.
+   * Esta função remove apenas o registro do histórico
+   * com base no índice exibido na interface.
    */
   async function removerHistorico(itemId, indexHistorico) {
     const item = itens.find((i) => i.id === itemId)
@@ -325,10 +223,14 @@ function App() {
   }
 
   /**
-   * Remove um item inteiro.
+   * Remove um item do sistema.
    *
-   * Primeiro remove o histórico relacionado,
-   * depois remove o próprio item.
+   * Fluxo:
+   * 1. remove todo o histórico relacionado ao item
+   * 2. remove o item da tabela "itens"
+   * 3. volta para o dashboard
+   * 4. limpa o item selecionado
+   * 5. recarrega os itens
    */
   async function removerItem(itemId) {
     await supabase.from("historico").delete().eq("item_id", itemId)
@@ -340,7 +242,11 @@ function App() {
   }
 
   /**
-   * Adiciona um novo item ao estoque.
+   * Adiciona um novo item no estoque.
+   *
+   * Depois do cadastro:
+   * - volta para o dashboard
+   * - recarrega a lista de itens
    */
   async function adicionarItem(novoItem) {
     await supabase.from("itens").insert([
@@ -357,7 +263,7 @@ function App() {
   }
 
   /**
-   * Abre a tela de detalhe de um item.
+   * Abre a tela de detalhes de um item específico.
    */
   function abrirItem(id) {
     setItemSelecionadoId(id)
@@ -365,7 +271,8 @@ function App() {
   }
 
   /**
-   * Volta para o dashboard principal.
+   * Retorna para a tela principal do dashboard
+   * e limpa o item selecionado.
    */
   function voltarDashboard() {
     setModoTela("dashboard")
@@ -373,7 +280,10 @@ function App() {
   }
 
   /**
-   * Faz logout do usuário e limpa os dados salvos localmente.
+   * Faz logout do usuário atual.
+   *
+   * Também limpa os dados salvos no localStorage
+   * para evitar reabertura automática de sessão/tela.
    */
   function sair() {
     setUsuarioLogado(null)
@@ -384,10 +294,11 @@ function App() {
     localStorage.removeItem("drybox_item_selecionado")
   }
 
-  // Enquanto carrega os dados iniciais, mostra mensagem simples
+  // Enquanto os dados iniciais estão sendo carregados,
+  // exibe uma mensagem simples de carregamento
   if (carregando) return <div>Carregando...</div>
 
-  // Se não tiver usuário logado, mostra tela de login
+  // Se não houver usuário logado, mostra a tela de login
   if (!usuarioLogado) {
     return (
       <Login
@@ -417,7 +328,7 @@ function App() {
     return <NovoItem voltar={voltarDashboard} adicionarItem={adicionarItem} />
   }
 
-  // Tela de detalhe do item selecionado
+  // Tela de detalhes do item selecionado
   if (modoTela === "item") {
     const itemSelecionado = itens.find((i) => i.id === itemSelecionadoId)
 
@@ -426,7 +337,6 @@ function App() {
         item={itemSelecionado}
         voltar={voltarDashboard}
         registrarMovimentacao={registrarMovimentacao}
-        editarMovimentacao={editarMovimentacao}
         usuario={usuarioLogado}
         removerHistorico={removerHistorico}
         removerItem={removerItem}
