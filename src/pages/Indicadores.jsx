@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { supabase } from "../supabase.js"
 import "./Indicadores.css"
@@ -6,49 +5,77 @@ import "./Indicadores.css"
 /**
  * Tela de Indicadores / Performance
  *
- * Responsável por:
- * - mostrar o técnico logado
- * - preencher o formulário de reparo
- * - preencher automaticamente o defeito com base no código
- * - salvar os dados na tabela "indicadores_reparo" do Supabase
+ * Essa tela foi pensada para lançar:
+ * - dados gerais da ordem (cabeçalho)
+ * - vários defeitos / reparos na mesma ordem
+ *
+ * Estrutura da tela:
+ * 1. Cabeçalho fixo da ordem
+ * 2. Tabela com múltiplas linhas de lançamento
+ *
+ * Cada linha da tabela representa um lançamento separado,
+ * mas todos compartilham os dados gerais da mesma ordem.
  */
 function Indicadores({ usuarioLogado, voltar }) {
   /**
-   * Estado do formulário.
+   * Estado do cabeçalho.
    *
-   * Cada campo representa uma coluna da tabela indicadores_reparo.
-   * O campo "tecnico" não é digitado manualmente:
-   * ele vem automaticamente do usuário logado.
+   * Esses campos ficam no topo da tela
+   * e valem para todos os lançamentos da ordem.
    */
-  const [form, setForm] = useState({
+  const [cabecalho, setCabecalho] = useState({
     ordem: "",
     seguimento: "",
     modelo: "",
-    codigo: "",
-    defeito: "",
-    pmec: "",
-    falha: "",
-    linha: "",
-    qtd: "",
+    codigoItem: "",
     data: "",
   })
 
   /**
-   * Controla o estado do botão salvar.
+   * Função auxiliar para criar uma linha vazia.
    *
-   * Quando true:
-   * - evita clique duplo
-   * - mostra que está salvando
+   * Foi separada assim para evitar repetir o mesmo objeto
+   * em vários lugares do código.
+   */
+  function criarLinhaVazia() {
+    return {
+      codigo: "",
+      defeito: "",
+      pmec: "",
+      falha: "",
+      linha: "",
+      qtd: "",
+    }
+  }
+
+  /**
+   * Estado com as linhas de lançamento.
+   *
+   * Cada item desse array representa uma linha da tabela.
+   * O sistema começa com 2 linhas vazias por padrão.
+   */
+  const [lancamentos, setLancamentos] = useState([
+    criarLinhaVazia(),
+    criarLinhaVazia(),
+  ])
+
+  /**
+   * Controla o botão de salvar.
+   *
+   * Quando estiver true:
+   * - evita múltiplos cliques
+   * - mostra "Salvando..."
    */
   const [salvando, setSalvando] = useState(false)
 
   /**
-   * Tabela local de códigos e defeitos.
+   * Tabela local que relaciona código -> defeito.
    *
-   * Serve para preencher automaticamente o defeito
-   * quando o usuário informar um código conhecido.
+   * Quando o usuário digita um código conhecido,
+   * o defeito é preenchido automaticamente.
    *
-   * Depois, se você quiser, isso pode virar uma tabela no banco.
+   * Depois isso pode virar uma tabela no banco,
+   * mas por enquanto está fixo no sistema.
    */
   const defeitosPorCodigo = {
     95: "CORRENTE BAIXA",
@@ -60,7 +87,7 @@ function Indicadores({ usuarioLogado, voltar }) {
    * Lista padronizada de linhas/origens.
    *
    * Isso evita erro de digitação
-   * e ajuda muito nos gráficos depois.
+   * e mantém o padrão para futuros relatórios e gráficos.
    */
   const linhasDisponiveis = [
     "MFAN1-01",
@@ -70,95 +97,214 @@ function Indicadores({ usuarioLogado, voltar }) {
   ]
 
   /**
-   * Atualiza os campos do formulário.
+   * Atualiza os campos do cabeçalho.
    *
-   * Regras especiais:
-   * - se o campo alterado for "codigo",
-   *   o sistema tenta preencher o "defeito" automaticamente
-   * - se o código não existir no mapa local, o defeito fica vazio
+   * Exemplo:
+   * - ordem
+   * - seguimento
+   * - modelo
+   * - código do item
+   * - data
    */
-  function handleChange(evento) {
+  function handleCabecalhoChange(evento) {
     const { name, value } = evento.target
 
-    setForm((estadoAnterior) => {
-      const novoEstado = {
-        ...estadoAnterior,
-        [name]: value,
+    setCabecalho((estadoAnterior) => ({
+      ...estadoAnterior,
+      [name]: value,
+    }))
+  }
+
+  /**
+   * Atualiza um campo de uma linha específica da tabela.
+   *
+   * Parâmetros:
+   * - index: posição da linha no array
+   * - campo: nome do campo que será alterado
+   * - valor: novo valor digitado pelo usuário
+   *
+   * Regra especial:
+   * - se o campo alterado for "codigo",
+   *   o sistema tenta preencher o defeito automaticamente.
+   */
+  function handleLinhaChange(index, campo, valor) {
+    setLancamentos((estadoAnterior) => {
+      const novasLinhas = [...estadoAnterior]
+
+      novasLinhas[index] = {
+        ...novasLinhas[index],
+        [campo]: valor,
       }
 
-      if (name === "codigo") {
-        novoEstado.defeito = defeitosPorCodigo[value] || ""
+      /**
+       * Auto preenchimento do defeito com base no código.
+       *
+       * Se o código existir no mapa local,
+       * o defeito é preenchido automaticamente.
+       * Caso contrário, fica vazio.
+       */
+      if (campo === "codigo") {
+        novasLinhas[index].defeito = defeitosPorCodigo[valor] || ""
       }
 
-      return novoEstado
+      return novasLinhas
     })
   }
 
   /**
-   * Limpa o formulário após salvar.
+   * Adiciona uma nova linha vazia à tabela.
    *
-   * Mantém todos os campos vazios para um novo lançamento.
+   * Isso permite lançar mais de um defeito/reparo
+   * dentro da mesma ordem.
+   */
+  function adicionarLinha() {
+    setLancamentos((estadoAnterior) => [
+      ...estadoAnterior,
+      criarLinhaVazia(),
+    ])
+  }
+
+  /**
+   * Remove uma linha da tabela pelo índice.
+   *
+   * Regra:
+   * - o sistema precisa manter pelo menos 2 linhas visíveis,
+   *   então não permite remover se só existirem 2.
+   */
+  function removerLinha(index) {
+    if (lancamentos.length <= 2) {
+      alert("É preciso manter pelo menos 2 linhas.")
+      return
+    }
+
+    setLancamentos((estadoAnterior) =>
+      estadoAnterior.filter((_, i) => i !== index)
+    )
+  }
+
+  /**
+   * Limpa todo o formulário após salvar com sucesso.
+   *
+   * Reseta:
+   * - cabeçalho
+   * - linhas de lançamento
    */
   function limparFormulario() {
-    setForm({
+    setCabecalho({
       ordem: "",
       seguimento: "",
       modelo: "",
-      codigo: "",
-      defeito: "",
-      pmec: "",
-      falha: "",
-      linha: "",
-      qtd: "",
+      codigoItem: "",
       data: "",
     })
+
+    setLancamentos([criarLinhaVazia(), criarLinhaVazia()])
   }
 
   /**
-   * Salva o lançamento no Supabase.
+   * Salva os lançamentos no Supabase.
    *
    * Fluxo:
-   * 1. valida os campos obrigatórios
-   * 2. monta o objeto com o técnico logado
-   * 3. insere na tabela indicadores_reparo
-   * 4. avisa se salvou com sucesso
-   * 5. limpa o formulário
+   * 1. valida o cabeçalho
+   * 2. separa apenas as linhas preenchidas
+   * 3. monta um array de objetos para salvar
+   * 4. envia tudo de uma vez para o banco
+   * 5. limpa o formulário se der certo
    */
   async function salvarLancamento() {
-    if (!form.ordem || !form.codigo || !form.qtd || !form.linha) {
-      alert("Preencha pelo menos: ordem, código, linha e quantidade.")
+    /**
+     * Validação mínima do cabeçalho.
+     *
+     * Sem ordem, não faz sentido salvar.
+     */
+    if (!cabecalho.ordem) {
+      alert("Preencha a ordem.")
+      return
+    }
+
+    /**
+     * Filtra apenas as linhas válidas.
+     *
+     * Uma linha só será salva se tiver:
+     * - código
+     * - linha/origem
+     * - quantidade
+     */
+    const linhasValidas = lancamentos.filter(
+      (item) => item.codigo && item.linha && item.qtd
+    )
+
+    if (linhasValidas.length === 0) {
+      alert("Preencha pelo menos uma linha com código, origem e quantidade.")
       return
     }
 
     setSalvando(true)
 
-    const dadosParaSalvar = {
-      tecnico: usuarioLogado?.nome || "",
-      ordem: form.ordem,
-      seguimento: form.seguimento,
-      modelo: form.modelo,
-      codigo: Number(form.codigo),
-      defeito: form.defeito,
-      pmec: form.pmec,
-      falha: form.falha,
-      linha: form.linha,
-      qtd: Number(form.qtd),
-      data: form.data || new Date().toLocaleString("pt-BR"),
-    }
+    /**
+     * Se o usuário não preencher a data,
+     * o sistema usa a data/hora atual em pt-BR.
+     */
+    const dataFinal = cabecalho.data || new Date().toLocaleString("pt-BR")
 
+    /**
+     * Monta os dados no formato esperado pela tabela do banco.
+     *
+     * Importante:
+     * Cada linha da tabela gera um registro separado no Supabase.
+     * Porém, os dados do cabeçalho são repetidos em todos.
+     */
+    const dadosParaSalvar = linhasValidas.map((item) => ({
+      tecnico: usuarioLogado?.nome || "",
+      ordem: cabecalho.ordem,
+      seguimento: cabecalho.seguimento,
+      modelo: cabecalho.modelo,
+
+      /**
+       * Código do item / produto da ordem.
+       *
+       * Atenção:
+       * essa coluna precisa existir no banco.
+       * Se não existir, remova essa linha
+       * ou crie a coluna no Supabase.
+       */
+      codigo_item: cabecalho.codigoItem || null,
+
+      /**
+       * Código do defeito/reparo da linha.
+       */
+      codigo: Number(item.codigo),
+
+      defeito: item.defeito,
+      pmec: item.pmec,
+      falha: item.falha,
+      linha: item.linha,
+      qtd: Number(item.qtd),
+      data: dataFinal,
+    }))
+
+    /**
+     * Envia todos os registros para o banco de uma vez.
+     */
     const { error } = await supabase
       .from("indicadores_reparo")
-      .insert([dadosParaSalvar])
+      .insert(dadosParaSalvar)
 
     setSalvando(false)
 
+    /**
+     * Tratamento de erro.
+     */
     if (error) {
       console.error("Erro ao salvar lançamento:", error)
       alert("Erro ao salvar no banco.")
       return
     }
 
-    alert("Lançamento salvo com sucesso.")
+    /**
+     * Sucesso.
+     */
+    alert("Lançamentos salvos com sucesso.")
     limparFormulario()
   }
 
@@ -187,15 +333,19 @@ function Indicadores({ usuarioLogado, voltar }) {
             <strong>Técnico responsável:</strong> {usuarioLogado?.nome}
           </p>
 
-          <div className="indicadores-grid">
+          {/* ========================================================
+              BLOCO 1 - CABEÇALHO DA ORDEM
+              Esses campos ficam no topo e valem para todos os lançamentos
+             ======================================================== */}
+          <div className="indicadores-grid-topo">
             <div className="indicadores-campo">
               <label>Ordem</label>
               <input
                 type="text"
                 name="ordem"
-                value={form.ordem}
-                onChange={handleChange}
-                placeholder="Ex: 10251090"
+                value={cabecalho.ordem}
+                onChange={handleCabecalhoChange}
+                placeholder="Ex: 10265524"
               />
             </div>
 
@@ -204,9 +354,9 @@ function Indicadores({ usuarioLogado, voltar }) {
               <input
                 type="text"
                 name="seguimento"
-                value={form.seguimento}
-                onChange={handleChange}
-                placeholder="Ex: PCI"
+                value={cabecalho.seguimento}
+                onChange={handleCabecalhoChange}
+                placeholder="Ex: ANALÓGICA"
               />
             </div>
 
@@ -215,80 +365,20 @@ function Indicadores({ usuarioLogado, voltar }) {
               <input
                 type="text"
                 name="modelo"
-                value={form.modelo}
-                onChange={handleChange}
-                placeholder="Ex: U25"
+                value={cabecalho.modelo}
+                onChange={handleCabecalhoChange}
+                placeholder="Ex: 4560052"
               />
             </div>
 
             <div className="indicadores-campo">
-              <label>Código</label>
-              <input
-                type="number"
-                name="codigo"
-                value={form.codigo}
-                onChange={handleChange}
-                placeholder="Ex: 95"
-              />
-            </div>
-
-            <div className="indicadores-campo">
-              <label>Defeito</label>
+              <label>Código do item</label>
               <input
                 type="text"
-                name="defeito"
-                value={form.defeito}
-                onChange={handleChange}
-                placeholder="Preenchido automático pelo código"
-              />
-            </div>
-
-            <div className="indicadores-campo">
-              <label>P.Mec</label>
-              <input
-                type="text"
-                name="pmec"
-                value={form.pmec}
-                onChange={handleChange}
-                placeholder="Ex: R181"
-              />
-            </div>
-
-            <div className="indicadores-campo">
-              <label>Falha</label>
-              <input
-                type="text"
-                name="falha"
-                value={form.falha}
-                onChange={handleChange}
-                placeholder="Ex: TOMBSTONE"
-              />
-            </div>
-
-            <div className="indicadores-campo">
-              <label>Linha</label>
-              <select
-                name="linha"
-                value={form.linha}
-                onChange={handleChange}
-              >
-                <option value="">Selecione a linha</option>
-                {linhasDisponiveis.map((linha) => (
-                  <option key={linha} value={linha}>
-                    {linha}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="indicadores-campo">
-              <label>Quantidade</label>
-              <input
-                type="number"
-                name="qtd"
-                value={form.qtd}
-                onChange={handleChange}
-                placeholder="Ex: 2"
+                name="codigoItem"
+                value={cabecalho.codigoItem}
+                onChange={handleCabecalhoChange}
+                placeholder="Ex: 2102168"
               />
             </div>
 
@@ -297,21 +387,141 @@ function Indicadores({ usuarioLogado, voltar }) {
               <input
                 type="text"
                 name="data"
-                value={form.data}
-                onChange={handleChange}
-                placeholder="Se deixar vazio, usa a data atual"
+                value={cabecalho.data}
+                onChange={handleCabecalhoChange}
+                placeholder="Se vazio, usa a atual"
               />
             </div>
           </div>
 
+          {/* ========================================================
+              BLOCO 2 - TABELA DE LANÇAMENTOS
+              Cada linha representa um defeito/reparo da mesma ordem
+             ======================================================== */}
+          <div className="indicadores-tabela-wrap">
+            <table className="indicadores-tabela">
+              <thead>
+                <tr>
+                  <th>CÓD</th>
+                  <th>DEFEITO</th>
+                  <th>P.MEC</th>
+                  <th>FALHA</th>
+                  <th>ORIGEM</th>
+                  <th>QTD</th>
+                  <th>AÇÃO</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {lancamentos.map((item, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="number"
+                        value={item.codigo}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "codigo", e.target.value)
+                        }
+                        placeholder="95"
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        value={item.defeito}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "defeito", e.target.value)
+                        }
+                        placeholder="Automático"
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        value={item.pmec}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "pmec", e.target.value)
+                        }
+                        placeholder="Ex: R181"
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        type="text"
+                        value={item.falha}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "falha", e.target.value)
+                        }
+                        placeholder="Ex: TOMBSTONE"
+                      />
+                    </td>
+
+                    <td>
+                      <select
+                        value={item.linha}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "linha", e.target.value)
+                        }
+                      >
+                        <option value="">Selecione</option>
+                        {linhasDisponiveis.map((linha) => (
+                          <option key={linha} value={linha}>
+                            {linha}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    <td>
+                      <input
+                        type="number"
+                        value={item.qtd}
+                        onChange={(e) =>
+                          handleLinhaChange(index, "qtd", e.target.value)
+                        }
+                        placeholder="2"
+                      />
+                    </td>
+
+                    <td>
+                      <button
+                        type="button"
+                        className="indicadores-botao-remover"
+                        onClick={() => removerLinha(index)}
+                      >
+                        Remover
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ========================================================
+              AÇÕES DA TELA
+              - adicionar nova linha
+              - salvar todos os lançamentos
+             ======================================================== */}
           <div className="indicadores-acoes">
+            <button
+              type="button"
+              onClick={adicionarLinha}
+              className="indicadores-botao-secundario"
+            >
+              + Adicionar linha
+            </button>
+
             <button
               type="button"
               onClick={salvarLancamento}
               className="indicadores-botao-salvar"
               disabled={salvando}
             >
-              {salvando ? "Salvando..." : "Salvar lançamento"}
+              {salvando ? "Salvando..." : "Salvar lançamentos"}
             </button>
           </div>
         </div>
