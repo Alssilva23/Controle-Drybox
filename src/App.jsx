@@ -4,17 +4,16 @@ import Dashboard from "./pages/Dashboard.jsx"
 import ItemDetalhe from "./pages/ItemDetalhe.jsx"
 import NovoItem from "./pages/NovoItem.jsx"
 import AdminUsuarios from "./pages/AdminUsuarios.jsx"
-import Indicadores from "./pages/Indicadores.jsx"
 import { supabase } from "./supabase.js"
 
 function App() {
   // Usuário atualmente logado no sistema
   const [usuarioLogado, setUsuarioLogado] = useState(null)
 
- // Controla qual tela está sendo exibida
-// Possíveis valores:
-// "dashboard", "item", "novo-item", "admin-usuarios", "indicadores"
-const [modoTela, setModoTela] = useState("dashboard")
+  // Controla qual tela está sendo exibida
+  // Possíveis valores:
+  // "dashboard", "item", "novo-item", "admin-usuarios"
+  const [modoTela, setModoTela] = useState("dashboard")
 
   // Guarda o ID do item selecionado para abrir a tela de detalhes
   const [itemSelecionadoId, setItemSelecionadoId] = useState(null)
@@ -312,30 +311,13 @@ const [modoTela, setModoTela] = useState("dashboard")
     )
   }
 
-   // Tela de administração de usuários
+  // Tela de administração de usuários
   if (modoTela === "admin-usuarios") {
     return (
       <AdminUsuarios
         usuarioLogado={usuarioLogado}
         usuarios={usuarios}
         salvarUsuarios={setUsuarios}
-        voltar={voltarDashboard}
-      />
-    )
-  }
-
-  /**
-   * Tela de indicadores e performance
-   *
-   * Serve para abrir a nova página de indicadores.
-   * Essa página vai receber:
-   * - o usuário logado, para vincular os lançamentos ao técnico certo
-   * - a função voltar, para retornar ao dashboard principal
-   */
-  if (modoTela === "indicadores") {
-    return (
-      <Indicadores
-        usuarioLogado={usuarioLogado}
         voltar={voltarDashboard}
       />
     )
@@ -362,7 +344,7 @@ const [modoTela, setModoTela] = useState("dashboard")
     )
   }
 
-   // Tela principal do sistema
+  // Tela principal do sistema
   return (
     <Dashboard
       usuario={usuarioLogado}
@@ -370,7 +352,6 @@ const [modoTela, setModoTela] = useState("dashboard")
       aoSelecionarItem={abrirItem}
       aoNovoItem={() => setModoTela("novo-item")}
       aoAbrirAdmin={() => setModoTela("admin-usuarios")}
-      aoAbrirIndicadores={() => setModoTela("indicadores")}
       aoSair={sair}
     />
   )
