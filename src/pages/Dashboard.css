@@ -1,0 +1,361 @@
+/* =========================================================
+   PÁGINA GERAL
+   =========================================================
+   Essas classes controlam a estrutura principal da tela:
+   fundo, altura total e divisão entre sidebar e conteúdo.
+========================================================= */
+
+.dashboard-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard-layout {
+  display: flex;
+}
+
+/* =========================================================
+   SIDEBAR / MENU LATERAL
+   =========================================================
+   Área fixa da esquerda:
+   - nome do sistema
+   - usuário logado
+   - botões de navegação
+========================================================= */
+
+.dashboard-sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Título principal do sistema na lateral */
+.dashboard-logo {
+  margin: 0;
+  color: #16a34a;
+}
+
+/* Subtítulo abaixo do nome DryBox */
+.dashboard-subtitle {
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+/* Card com informações do usuário logado */
+.dashboard-user-card {
+  margin-top: 20px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+/* Nome do usuário logado */
+.dashboard-user-name {
+  font-weight: bold;
+  color: #111827;
+}
+
+/* Perfil do usuário logado: admin, técnico etc */
+.dashboard-user-role {
+  color: #6b7280;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Área que agrupa os botões do menu lateral */
+.dashboard-menu {
+  margin-top: 30px;
+}
+
+/* Item fixo do menu, usado para destacar a tela atual */
+.dashboard-menu-item {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* Estilo do item ativo no menu */
+.dashboard-menu-item-active {
+  background: #16a34a;
+  color: white;
+}
+
+/* Botões clicáveis do menu lateral */
+.dashboard-menu-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  color: #374151;
+  margin-bottom: 10px;
+  background: #f9fafb;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+}
+
+/* Efeito ao passar o mouse nos botões laterais */
+.dashboard-menu-button:hover {
+  background: #e5e7eb;
+}
+
+/* =========================================================
+   CONTEÚDO PRINCIPAL
+   =========================================================
+   Área da direita onde aparece:
+   - mensagem de boas-vindas
+   - cards
+   - pesquisa
+   - tabela
+========================================================= */
+
+.dashboard-content {
+  flex: 1;
+  padding: 30px;
+}
+
+/* Bloco de cabeçalho da área principal */
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+/* Título principal da tela */
+.dashboard-title {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.1;
+  color: #111827;
+}
+
+/* Texto pequeno abaixo do título */
+.dashboard-description {
+  color: #6b7280;
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+/* =========================================================
+   CARDS DE RESUMO
+   =========================================================
+   Cards que mostram:
+   - total de itens
+   - peças em estoque
+   - itens esgotados
+========================================================= */
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Caixa visual individual de cada card */
+.dashboard-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+/* Texto menor do card, tipo rótulo */
+.dashboard-card-label {
+  color: #6b7280;
+  margin-top: 0;
+}
+
+/* Número principal do card */
+.dashboard-card-value {
+  margin: 0;
+}
+
+/* Valor em destaque vermelho, usado para esgotados */
+.dashboard-card-value-danger {
+  color: #dc2626;
+}
+
+/* =========================================================
+   PAINEL PRINCIPAL
+   =========================================================
+   Caixa branca que contém:
+   - título da tabela
+   - botões de ação
+   - busca
+   - tabela de itens
+========================================================= */
+
+.dashboard-panel {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+/* Cabeçalho do painel com título e botões */
+.dashboard-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Título do painel principal */
+.dashboard-panel-title {
+  margin: 0;
+}
+
+/* Área que agrupa os botões Exportar e Novo Item */
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   BOTÕES GERAIS
+   =========================================================
+   Estilos reutilizáveis para botões do sistema
+========================================================= */
+
+/* Estilo base de botão */
+.dashboard-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: white;
+  white-space: nowrap;
+}
+
+/* Botão ocupando a largura toda */
+.dashboard-btn-full {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Botão azul */
+.dashboard-btn-primary {
+  background: #2563eb;
+}
+
+/* Botão verde */
+.dashboard-btn-success {
+  background: #16a34a;
+}
+
+/* Botão vermelho */
+.dashboard-btn-danger {
+  background: #ef4444;
+}
+
+/* =========================================================
+   CAMPO DE BUSCA
+   =========================================================
+   Campo usado para filtrar itens por código, nome ou local
+========================================================= */
+
+.dashboard-search-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+/* Ícone visual da busca */
+.dashboard-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Input de busca */
+.dashboard-search-input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  font-size: 15px;
+  background: white;
+  color: #111827;
+}
+
+/* =========================================================
+   TABELA DE ITENS
+   =========================================================
+   Lista dos componentes cadastrados no sistema
+========================================================= */
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Linha do cabeçalho da tabela */
+.dashboard-table thead tr {
+  background: #f9fafb;
+  text-align: left;
+}
+
+/* Células da tabela */
+.dashboard-table th,
+.dashboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Linha normal da tabela */
+.dashboard-table-row {
+  cursor: pointer;
+  background: white;
+  transition: background 0.2s ease;
+}
+
+/* Cor ao passar o mouse na linha */
+.dashboard-table-row-hover {
+  background: #d1d5db;
+}
+
+/* Mensagem quando não houver itens */
+.dashboard-empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Texto usado quando quantidade está zerada */
+.dashboard-out-of-stock {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   =========================================================
+   Ajustes para telas menores como notebook pequeno,
+   tablet ou celular
+========================================================= */
+
+@media (max-width: 900px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+}
