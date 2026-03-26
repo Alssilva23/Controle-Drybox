@@ -1,0 +1,130 @@
+/* =========================================================
+   PÁGINA GERAL
+   ========================================================= */
+
+.indicadores-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Área central que limita a largura do conteúdo */
+.indicadores-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =========================================================
+   TOPO DA TELA
+   ========================================================= */
+
+.indicadores-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.indicadores-titulo {
+  margin: 0;
+  color: #111827;
+}
+
+.indicadores-subtitulo {
+  margin-top: 6px;
+  color: #6b7280;
+}
+
+.indicadores-botao-voltar {
+  border: none;
+  background: #e5e7eb;
+  color: #111827;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   CARD PRINCIPAL
+   ========================================================= */
+
+.indicadores-card {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.indicadores-tecnico {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+/* =========================================================
+   FORMULÁRIO
+   ========================================================= */
+
+.indicadores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.indicadores-campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.indicadores-campo label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #374151;
+}
+
+.indicadores-campo input,
+.indicadores-campo select {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: white;
+  color: #111827;
+}
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+
+.indicadores-acoes {
+  margin-top: 24px;
+}
+
+.indicadores-botao-salvar {
+  border: none;
+  background: #16a34a;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.indicadores-botao-salvar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .indicadores-grid {
+    grid-template-columns: 1fr;
+  }
+}
