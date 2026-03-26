@@ -1,16 +1,41 @@
 import { useState } from "react"
+import "./Dashboard.css"
 
+/**
+ * Tela principal do sistema DryBox
+ *
+ * Responsável por:
+ * - mostrar informações do usuário logado
+ * - exibir os cards com resumo do estoque
+ * - permitir busca de itens
+ * - abrir detalhes do item
+ * - abrir tela de novo item
+ * - abrir administração
+ * - abrir tela de indicadores
+ */
 function Dashboard({
   usuario,
   itens,
   aoSelecionarItem,
   aoNovoItem,
   aoAbrirAdmin,
+  aoAbrirIndicadores,
   aoSair,
 }) {
+  // Controla o texto digitado na busca
   const [busca, setBusca] = useState("")
+
+  // Guarda qual linha da tabela está com hover
   const [linhaHover, setLinhaHover] = useState(null)
 
+  /**
+   * Filtra os itens de acordo com o texto da busca.
+   *
+   * A busca verifica:
+   * - código
+   * - nome
+   * - local
+   */
   const itensFiltrados = itens.filter((item) => {
     const termo = busca.toLowerCase()
 
@@ -21,10 +46,18 @@ function Dashboard({
     )
   })
 
+  // Total de registros cadastrados
   const totalItens = itens.length
+
+  // Soma total das quantidades em estoque
   const totalPecas = itens.reduce((acc, item) => acc + Number(item.quantidade || 0), 0)
+
+  // Quantidade de itens zerados
   const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
 
+  /**
+   * Abre uma janela para impressão/exportação da lista atual de componentes.
+   */
   function exportarLista() {
     const janela = window.open("", "", "width=900,height=700")
 
@@ -70,6 +103,11 @@ function Dashboard({
     janela.print()
   }
 
+  /**
+   * Abre a área de administração.
+   *
+   * Somente usuários com perfil "admin" podem acessar.
+   */
   function abrirAdministracao() {
     if (String(usuario?.perfil || "").trim().toLowerCase() !== "admin") {
       alert("Somente admin pode acessar essa área")
@@ -80,182 +118,86 @@ function Dashboard({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial" }}>
-      <div style={{ display: "flex" }}>
-        <div
-          style={{
-            width: "260px",
-            background: "#ffffff",
-            borderRight: "1px solid #e5e7eb",
-            minHeight: "100vh",
-            padding: "24px",
-            boxSizing: "border-box",
-          }}
-        >
-          <h2 style={{ margin: 0, color: "#16a34a" }}>DryBox</h2>
-          <p style={{ color: "#6b7280", marginTop: "6px" }}>Sistema de Estoque</p>
+    <div className="dashboard-page">
+      <div className="dashboard-layout">
+        {/* Barra lateral do sistema */}
+        <aside className="dashboard-sidebar">
+          <h2 className="dashboard-logo">DryBox</h2>
+          <p className="dashboard-subtitle">Sistema de Estoque</p>
 
-          <div
-            style={{
-              marginTop: "20px",
-              padding: "12px",
-              background: "#f9fafb",
-              borderRadius: "10px",
-            }}
-          >
-            <div style={{ fontWeight: "bold", color: "#111827" }}>{usuario?.nome}</div>
-            <div style={{ color: "#6b7280", fontSize: "14px", marginTop: "4px" }}>
-              Perfil: {usuario?.perfil}
-            </div>
+          {/* Card com dados do usuário logado */}
+          <div className="dashboard-user-card">
+            <div className="dashboard-user-name">{usuario?.nome}</div>
+            <div className="dashboard-user-role">Perfil: {usuario?.perfil}</div>
 
             <button
+              type="button"
               onClick={aoSair}
-              style={{
-                marginTop: "12px",
-                width: "100%",
-                background: "#ef4444",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                padding: "10px",
-                cursor: "pointer",
-              }}
+              className="dashboard-btn dashboard-btn-danger dashboard-btn-full"
             >
               Sair
             </button>
           </div>
 
-          <div style={{ marginTop: "30px" }}>
-            <div
-              style={{
-                background: "#16a34a",
-                color: "white",
-                padding: "12px",
-                borderRadius: "10px",
-                marginBottom: "10px",
-              }}
-            >
+          {/* Menu lateral */}
+          <div className="dashboard-menu">
+            <div className="dashboard-menu-item dashboard-menu-item-active">
               Controle de Componentes
             </div>
 
-            <div
+            <button
+              type="button"
+              onClick={aoAbrirIndicadores}
+              className="dashboard-menu-button"
+            >
+              Indicadores / Performance
+            </button>
+
+            <button
+              type="button"
               onClick={abrirAdministracao}
-              style={{
-                padding: "12px",
-                borderRadius: "10px",
-                color: "#374151",
-                marginBottom: "10px",
-                background: "#f9fafb",
-                cursor: "pointer",
-              }}
+              className="dashboard-menu-button"
             >
               Administração
-            </div>
+            </button>
           </div>
-        </div>
+        </aside>
 
-        <div style={{ flex: 1, padding: "30px" }}>
-          <div style={{ marginBottom: "24px" }}>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "36px",
-                lineHeight: "1.1",
-                color: "#111827",
-              }}
-            >
-              Bem-vindo, {usuario?.nome}
-            </h1>
-
-            <p
-              style={{
-                color: "#6b7280",
-                marginTop: "8px",
-                fontSize: "18px",
-              }}
-            >
-              Gerencie o inventário local do DryBox
-            </p>
+        {/* Conteúdo principal */}
+        <main className="dashboard-content">
+          <div className="dashboard-header">
+            <h1 className="dashboard-title">Bem-vindo, {usuario?.nome}</h1>
+            <p className="dashboard-description">Gerencie o inventário local do DryBox</p>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "16px",
-              marginBottom: "24px",
-            }}
-          >
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
-              <p style={{ color: "#6b7280", marginTop: 0 }}>Total de Itens</p>
-              <h2>{totalItens}</h2>
+          {/* Cards com resumo do estoque */}
+          <div className="dashboard-cards">
+            <div className="dashboard-card">
+              <p className="dashboard-card-label">Total de Itens</p>
+              <h2 className="dashboard-card-value">{totalItens}</h2>
             </div>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
-              <p style={{ color: "#6b7280", marginTop: 0 }}>Peças em Estoque</p>
-              <h2>{totalPecas}</h2>
+            <div className="dashboard-card">
+              <p className="dashboard-card-label">Peças em Estoque</p>
+              <h2 className="dashboard-card-value">{totalPecas}</h2>
             </div>
 
-            <div
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "20px",
-                boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-              }}
-            >
-              <p style={{ color: "#6b7280", marginTop: 0 }}>Itens Esgotados</p>
-              <h2 style={{ color: "#dc2626" }}>{esgotados}</h2>
+            <div className="dashboard-card">
+              <p className="dashboard-card-label">Itens Esgotados</p>
+              <h2 className="dashboard-card-value dashboard-card-value-danger">{esgotados}</h2>
             </div>
           </div>
 
-          <div
-            style={{
-              background: "white",
-              borderRadius: "14px",
-              padding: "20px",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "16px",
-                gap: "16px",
-                flexWrap: "wrap",
-              }}
-            >
-              <h2 style={{ margin: 0 }}>Inventário de Componentes</h2>
+          {/* Bloco principal da tabela */}
+          <section className="dashboard-panel">
+            <div className="dashboard-panel-header">
+              <h2 className="dashboard-panel-title">Inventário de Componentes</h2>
 
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <div className="dashboard-actions">
                 <button
                   type="button"
                   onClick={exportarLista}
-                  style={{
-                    background: "#2563eb",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "10px 14px",
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                  }}
+                  className="dashboard-btn dashboard-btn-primary"
                 >
                   Exportar Lista
                 </button>
@@ -263,74 +205,41 @@ function Dashboard({
                 <button
                   type="button"
                   onClick={aoNovoItem}
-                  style={{
-                    background: "#16a34a",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "10px 14px",
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                  }}
+                  className="dashboard-btn dashboard-btn-success"
                 >
                   + Novo Item
                 </button>
               </div>
             </div>
 
-            <div style={{ position: "relative", marginBottom: "16px" }}>
-              <span
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#6b7280",
-                  fontSize: "16px",
-                }}
-              >
-                🔍
-              </span>
+            {/* Campo de pesquisa */}
+            <div className="dashboard-search-wrapper">
+              <span className="dashboard-search-icon">🔍</span>
 
               <input
                 type="text"
                 placeholder="Pesquisar por código, nome ou local"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "12px 12px 12px 40px",
-                  borderRadius: "10px",
-                  border: "1px solid #d1d5db",
-                  boxSizing: "border-box",
-                  fontSize: "15px",
-                  background: "white",
-                  color: "#111827",
-                }}
+                className="dashboard-search-input"
               />
             </div>
 
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            {/* Tabela de itens */}
+            <table className="dashboard-table">
               <thead>
-                <tr style={{ background: "#f9fafb", textAlign: "left" }}>
-                  <th style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>Código</th>
-                  <th style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>Nome</th>
-                  <th style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>Local</th>
-                  <th style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>Quantidade</th>
+                <tr>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>Local</th>
+                  <th>Quantidade</th>
                 </tr>
               </thead>
 
               <tbody>
                 {itensFiltrados.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="4"
-                      style={{
-                        padding: "20px",
-                        textAlign: "center",
-                        color: "#6b7280",
-                      }}
-                    >
+                    <td colSpan="4" className="dashboard-empty-state">
                       Nenhum componente encontrado.
                     </td>
                   </tr>
@@ -341,24 +250,18 @@ function Dashboard({
                       onClick={() => aoSelecionarItem(item.id)}
                       onMouseEnter={() => setLinhaHover(item.id)}
                       onMouseLeave={() => setLinhaHover(null)}
-                      style={{
-                        cursor: "pointer",
-                        background: linhaHover === item.id ? "#d1d5db" : "white",
-                        transition: "background 0.2s ease",
-                      }}
+                      className={
+                        linhaHover === item.id
+                          ? "dashboard-table-row dashboard-table-row-hover"
+                          : "dashboard-table-row"
+                      }
                     >
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.codigo}
-                      </td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.nome}
-                      </td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
-                        {item.local}
-                      </td>
-                      <td style={{ padding: "12px", borderBottom: "1px solid #e5e7eb" }}>
+                      <td>{item.codigo}</td>
+                      <td>{item.nome}</td>
+                      <td>{item.local}</td>
+                      <td>
                         {Number(item.quantidade || 0) === 0 ? (
-                          <span style={{ color: "#dc2626", fontWeight: "bold" }}>Esgotado</span>
+                          <span className="dashboard-out-of-stock">Esgotado</span>
                         ) : (
                           item.quantidade
                         )}
@@ -368,8 +271,8 @@ function Dashboard({
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
+          </section>
+        </main>
       </div>
     </div>
   )
