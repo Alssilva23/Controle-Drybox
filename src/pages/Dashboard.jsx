@@ -11,7 +11,6 @@ import "./Dashboard.css"
  * - abrir detalhes do item
  * - abrir tela de novo item
  * - abrir administração
- * - abrir tela de indicadores
  */
 function Dashboard({
   usuario,
@@ -19,7 +18,6 @@ function Dashboard({
   aoSelecionarItem,
   aoNovoItem,
   aoAbrirAdmin,
-  aoAbrirIndicadores,
   aoSair,
 }) {
   // Controla o texto digitado na busca
@@ -144,14 +142,6 @@ function Dashboard({
             <div className="dashboard-menu-item dashboard-menu-item-active">
               Controle de Componentes
             </div>
-
-            <button
-              type="button"
-              onClick={aoAbrirIndicadores}
-              className="dashboard-menu-button"
-            >
-              Indicadores / Performance
-            </button>
 
             <button
               type="button"
