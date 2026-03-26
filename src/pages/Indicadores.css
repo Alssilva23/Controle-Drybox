@@ -12,7 +12,7 @@
 
 /* Área central que limita a largura do conteúdo */
 .indicadores-container {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -32,11 +32,15 @@
 .indicadores-titulo {
   margin: 0;
   color: #111827;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .indicadores-subtitulo {
   margin-top: 6px;
+  margin-bottom: 0;
   color: #6b7280;
+  font-size: 14px;
 }
 
 .indicadores-botao-voltar {
@@ -44,8 +48,15 @@
   background: #e5e7eb;
   color: #111827;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.indicadores-botao-voltar:hover {
+  background: #d1d5db;
 }
 
 /* =========================================================
@@ -53,26 +64,29 @@
    ========================================================= */
 
 .indicadores-card {
-  background: white;
-  border-radius: 14px;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
 .indicadores-tecnico {
   margin-top: 0;
   margin-bottom: 24px;
   color: #111827;
+  font-size: 15px;
 }
 
 /* =========================================================
-   FORMULÁRIO
+   BLOCO SUPERIOR / CABEÇALHO DA ORDEM
+   Esses campos ficam no topo e valem para todos os lançamentos
    ========================================================= */
 
-.indicadores-grid {
+.indicadores-grid-topo {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
   gap: 16px;
+  margin-bottom: 24px;
 }
 
 .indicadores-campo {
@@ -82,36 +96,164 @@
 
 .indicadores-campo label {
   margin-bottom: 6px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 700;
   color: #374151;
 }
 
 .indicadores-campo input,
 .indicadores-campo select {
+  width: 100%;
+  min-height: 42px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px 12px;
   font-size: 14px;
   box-sizing: border-box;
-  background: white;
+  background: #ffffff;
   color: #111827;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.indicadores-campo input:focus,
+.indicadores-campo select:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 
 /* =========================================================
-   AÇÕES
+   TABELA DE LANÇAMENTOS
+   Cada linha representa um defeito/reparo
+   ========================================================= */
+
+.indicadores-tabela-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.indicadores-tabela {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+}
+
+.indicadores-tabela thead {
+  background: #166534;
+}
+
+.indicadores-tabela th {
+  color: #ffffff;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 12px;
+  white-space: nowrap;
+}
+
+.indicadores-tabela td {
+  padding: 10px 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  vertical-align: middle;
+}
+
+/* Efeito zebrado suave para facilitar leitura */
+.indicadores-tabela tbody tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.indicadores-tabela tbody tr:hover td {
+  background: #f0fdf4;
+}
+
+/* Inputs e selects dentro da tabela */
+.indicadores-tabela input,
+.indicadores-tabela select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #111827;
+  outline: none;
+}
+
+.indicadores-tabela input:focus,
+.indicadores-tabela select:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+}
+
+/* =========================================================
+   BOTÕES DA TABELA
+   ========================================================= */
+
+.indicadores-botao-remover {
+  border: none;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.indicadores-botao-remover:hover {
+  background: #b91c1c;
+}
+
+/* =========================================================
+   AÇÕES GERAIS DA TELA
    ========================================================= */
 
 .indicadores-acoes {
-  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.indicadores-botao-secundario {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.indicadores-botao-secundario:hover {
+  background: #1d4ed8;
 }
 
 .indicadores-botao-salvar {
   border: none;
   background: #16a34a;
-  color: white;
+  color: #ffffff;
   padding: 12px 18px;
   border-radius: 10px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.indicadores-botao-salvar:hover {
+  background: #15803d;
 }
 
 .indicadores-botao-salvar:disabled {
@@ -123,8 +265,41 @@
    RESPONSIVIDADE
    ========================================================= */
 
+@media (max-width: 1100px) {
+  .indicadores-grid-topo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
-  .indicadores-grid {
+  .indicadores-page {
+    padding: 16px;
+  }
+
+  .indicadores-card {
+    padding: 16px;
+  }
+
+  .indicadores-topo {
+    align-items: flex-start;
+  }
+
+  .indicadores-titulo {
+    font-size: 22px;
+  }
+
+  .indicadores-grid-topo {
     grid-template-columns: 1fr;
+  }
+
+  .indicadores-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .indicadores-botao-secundario,
+  .indicadores-botao-salvar,
+  .indicadores-botao-voltar {
+    width: 100%;
   }
 }
