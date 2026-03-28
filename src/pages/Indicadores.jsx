@@ -1,4 +1,5 @@
 import "./Indicadores.css"
+
 /* tela de itens mais utilizados */
 function Indicadores({ itens, aoVoltar }) {
   /* itens mais utilizados (baseado em saídas) */
@@ -19,12 +20,13 @@ function Indicadores({ itens, aoVoltar }) {
   return (
     <div className="indicadores-page">
       <div className="indicadores-container">
-
         {/* botão voltar */}
-      <button
-  onClick={aoVoltar}
-  style={{ background: "#e5e7eb", color: "black" }}
->
+        <button
+          onClick={aoVoltar}
+          className="indicadores-voltar"
+        >
+          ← Voltar
+        </button>
 
         {/* título */}
         <h1 className="indicadores-titulo">Itens mais utilizados</h1>
@@ -37,9 +39,10 @@ function Indicadores({ itens, aoVoltar }) {
             itensMaisUsados.map((item, index) => (
               <div key={item.id} className="indicadores-item">
                 <span className="indicadores-rank">#{index + 1}</span>
+
                 <span className="indicadores-nome">
-  {item.codigo} - {item.nome}
-</span>
+                  {item.codigo} - {item.nome}
+                </span>
 
                 {/* agora mostra SAÍDAS */}
                 <span className="indicadores-qtd">
@@ -49,7 +52,6 @@ function Indicadores({ itens, aoVoltar }) {
             ))
           )}
         </div>
-
       </div>
     </div>
   )
