@@ -14,7 +14,11 @@ function App() {
   // Possíveis valores:
   // "dashboard", "item", "novo-item", "admin-usuarios"
   const [modoTela, setModoTela] = useState("dashboard")
-
+  
+  /* abrir tela de mais utilizados */
+function abrirIndicadores() {
+  setModoTela("indicadores")
+}
   // Guarda o ID do item selecionado para abrir a tela de detalhes
   const [itemSelecionadoId, setItemSelecionadoId] = useState(null)
 
