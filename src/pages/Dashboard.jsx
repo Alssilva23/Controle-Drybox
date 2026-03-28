@@ -131,7 +131,7 @@ function Dashboard({
             <button
               type="button"
               onClick={aoSair}
-              className="dashboard-btn dashboard-btn-danger dashboard-btn-full"
+              className="dashboard-menu-item dashboard-btn-danger"
             >
               Sair
             </button>
