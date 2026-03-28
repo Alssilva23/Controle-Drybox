@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { supabase } from "../supabase"
+import "./AdminUsuarios.css"
 
 function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
   const [nome, setNome] = useState("")
