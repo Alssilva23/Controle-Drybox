@@ -5,6 +5,7 @@ import ItemDetalhe from "./pages/ItemDetalhe.jsx"
 import NovoItem from "./pages/NovoItem.jsx"
 import AdminUsuarios from "./pages/AdminUsuarios.jsx"
 import { supabase } from "./supabase.js"
+import Indicadores from "./pages/Indicadores.jsx"
 
 function App() {
   // Usuário atualmente logado no sistema
