@@ -37,11 +37,6 @@ function Dashboard({
   /* itens esgotados */
   const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
 
-  /* itens mais utilizados */
-  const itensMaisUsados = [...itens]
-    .sort((a, b) => Number(a.quantidade || 0) - Number(b.quantidade || 0))
-    .slice(0, 5)
-
   /* botão exportar lista */
   function exportarLista() {
     const janela = window.open("", "", "width=900,height=700")
