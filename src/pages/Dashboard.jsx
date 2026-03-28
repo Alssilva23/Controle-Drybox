@@ -98,13 +98,10 @@ function Dashboard({
       <div className="dashboard-layout">
         {/* menu lateral */}
         <aside className="dashboard-sidebar">
-          {/* logo do sistema */}
           <h2 className="dashboard-logo">DryBox</h2>
           <p className="dashboard-subtitle">Sistema de Estoque</p>
 
-          {/* botões do menu */}
           <div className="dashboard-menu">
-            {/* botão administração */}
             <button
               type="button"
               onClick={abrirAdministracao}
@@ -113,22 +110,19 @@ function Dashboard({
               Administração
             </button>
 
-            {/* botão mais utilizados */}
             <button
-  type="button"
-  onClick={aoAbrirIndicadores}
-  className="dashboard-menu-item dashboard-menu-item-active"
->
-  Mais utilizados
-</button>
+              type="button"
+              onClick={aoAbrirIndicadores}
+              className="dashboard-menu-item"
+            >
+              Mais utilizados
+            </button>
           </div>
 
-          {/* card com usuario logado */}
           <div className="dashboard-user-card">
             <div className="dashboard-user-name">{usuario?.nome}</div>
             <div className="dashboard-user-role">Perfil: {usuario?.perfil}</div>
 
-            {/* botão sair */}
             <button
               type="button"
               onClick={aoSair}
@@ -139,15 +133,13 @@ function Dashboard({
           </div>
         </aside>
 
-        {/* conteudo principal */}
         <main className="dashboard-content">
-          {/* topo da pagina */}
           <div className="dashboard-header">
             <h1 className="dashboard-title">Bem-vindo, {usuario?.nome}</h1>
             <p className="dashboard-description">Gerencie o inventário local do DryBox</p>
           </div>
 
-          {/* cards de resumo */}
+          {/* cards */}
           <div className="dashboard-cards">
             <div className="dashboard-card">
               <p className="dashboard-card-label">Total de Itens</p>
@@ -161,33 +153,18 @@ function Dashboard({
 
             <div className="dashboard-card">
               <p className="dashboard-card-label">Itens Esgotados</p>
-              <h2 className="dashboard-card-value dashboard-card-value-danger">{esgotados}</h2>
-            </div>
-
-            <div className="dashboard-card">
-              <p className="dashboard-card-label">Alta rotatividade</p>
-
-              {itensMaisUsados.length === 0 ? (
-                <p className="dashboard-empty-state">Sem dados</p>
-              ) : (
-                itensMaisUsados.map((item, index) => (
-                  <div key={item.id}>
-                    {index + 1}. {item.nome} ({item.quantidade})
-                  </div>
-                ))
-              )}
+              <h2 className="dashboard-card-value dashboard-card-value-danger">
+                {esgotados}
+              </h2>
             </div>
           </div>
 
-          {/* bloco principal */}
+          {/* tabela */}
           <section className="dashboard-panel">
-            {/* topo do bloco */}
             <div className="dashboard-panel-header">
               <h2 className="dashboard-panel-title">Inventário de Componentes</h2>
 
-              {/* botões do topo */}
               <div className="dashboard-actions">
-                {/* botão exportar lista */}
                 <button
                   type="button"
                   onClick={exportarLista}
@@ -196,7 +173,6 @@ function Dashboard({
                   Exportar Lista
                 </button>
 
-                {/* botão novo item */}
                 <button
                   type="button"
                   onClick={aoNovoItem}
@@ -207,7 +183,6 @@ function Dashboard({
               </div>
             </div>
 
-            {/* campo de busca */}
             <div className="dashboard-search-wrapper">
               <input
                 type="text"
@@ -218,7 +193,6 @@ function Dashboard({
               />
             </div>
 
-            {/* tabela */}
             <table className="dashboard-table">
               <thead>
                 <tr>
