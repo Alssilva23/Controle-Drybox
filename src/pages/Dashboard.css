@@ -61,6 +61,7 @@
 /* efeito ao passar no botão do menu */
 .dashboard-menu-item:hover {
   background: #15803d;
+  color: white;
 }
 
 /* card com usuario logado */
@@ -174,6 +175,7 @@
   padding: 10px 14px;
   cursor: pointer;
   color: white;
+  font-weight: bold;
 }
 
 /* botão exportar lista */
@@ -210,13 +212,25 @@
 .dashboard-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* cabeçalho da tabela */
+.dashboard-table th {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  color: #111827;
+  font-weight: bold;
 }
 
 /* celulas da tabela */
-.dashboard-table th,
 .dashboard-table td {
   padding: 12px;
   border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  color: #111827;
+  vertical-align: middle;
 }
 
 /* linha da tabela */
