@@ -1,3 +1,4 @@
+import "./Indicadores.css"
 /* tela de itens mais utilizados */
 function Indicadores({ itens, aoVoltar }) {
   /* itens mais utilizados (baseado em saídas) */
