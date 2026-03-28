@@ -1,0 +1,174 @@
+/* página */
+.item-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* botão voltar */
+.item-voltar {
+  margin-bottom: 16px;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* topo */
+.item-topo {
+  background: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.item-codigo {
+  color: #16a34a;
+  font-weight: bold;
+  margin: 0;
+}
+
+.item-nome {
+  margin: 4px 0 0 0;
+  font-size: 20px;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-qtd {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.item-excluir {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* layout */
+.item-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* card */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  flex: 1;
+  min-width: 300px;
+}
+
+/* histórico */
+.historico {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.historico-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.historico-tipo-entrada {
+  color: #16a34a;
+}
+
+.historico-tipo-saida {
+  color: #dc2626;
+}
+
+.historico-excluir {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+/* botões entrada/saida */
+.mov-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+/* padrão */
+.mov-btn-entrada {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.mov-btn-saida {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+/* ativo */
+.mov-btn-entrada.active {
+  background: #16a34a;
+  color: white;
+}
+
+.mov-btn-saida.active {
+  background: #dc2626;
+  color: white;
+}
+
+/* inputs */
+.input, .textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  margin-bottom: 12px;
+}
+
+.textarea {
+  min-height: 80px;
+  resize: none;
+}
+
+/* botão salvar */
+.btn-salvar {
+  width: 100%;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
