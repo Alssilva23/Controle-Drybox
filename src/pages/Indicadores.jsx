@@ -1,9 +1,18 @@
-
 /* tela de itens mais utilizados */
 function Indicadores({ itens, aoVoltar }) {
-  /* itens mais utilizados (menor quantidade) */
-  const itensMaisUsados = [...itens]
-    .sort((a, b) => Number(a.quantidade || 0) - Number(b.quantidade || 0))
+  /* itens mais utilizados (baseado em saídas) */
+  const itensMaisUsados = itens
+    .map((item) => {
+      const totalSaidas = (item.historico || [])
+        .filter((h) => h.tipo === "saida")
+        .reduce((acc, h) => acc + Number(h.quantidade || 0), 0)
+
+      return {
+        ...item,
+        totalSaidas,
+      }
+    })
+    .sort((a, b) => b.totalSaidas - a.totalSaidas)
     .slice(0, 5)
 
   return (
@@ -16,7 +25,7 @@ function Indicadores({ itens, aoVoltar }) {
         </button>
 
         {/* título */}
-        <h1 className="indicadores-titulo">Alta rotatividade</h1>
+        <h1 className="indicadores-titulo">Itens mais utilizados</h1>
 
         {/* lista */}
         <div className="indicadores-card">
@@ -27,7 +36,11 @@ function Indicadores({ itens, aoVoltar }) {
               <div key={item.id} className="indicadores-item">
                 <span className="indicadores-rank">#{index + 1}</span>
                 <span className="indicadores-nome">{item.nome}</span>
-                <span className="indicadores-qtd">{item.quantidade}</span>
+
+                {/* agora mostra SAÍDAS */}
+                <span className="indicadores-qtd">
+                  {item.totalSaidas}
+                </span>
               </div>
             ))
           )}
