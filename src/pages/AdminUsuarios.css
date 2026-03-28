@@ -1,10 +1,17 @@
+/* =========================================================
+   PÁGINA DE ADMINISTRAÇÃO DE USUÁRIOS
+   ========================================================= */
+
+/* Container principal da página inteira */
 .admin-container {
   min-height: 100vh;
   background: #f3f4f6;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   padding: 30px;
+  box-sizing: border-box;
 }
 
+/* Botão de voltar */
 .admin-voltar {
   margin-bottom: 20px;
   background: #e5e7eb;
@@ -12,22 +19,48 @@
   border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
+  font-size: 14px;
 }
 
+/* Efeito ao passar o mouse no botão voltar */
+.admin-voltar:hover {
+  background: #d1d5db;
+}
+
+/* Card branco usado em blocos da página */
 .admin-card {
   background: white;
   border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
 }
 
+/* Título principal da página */
+.admin-titulo {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/* Subtítulos das seções */
+.admin-subtitulo {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* Texto secundário, mais apagado */
+.admin-text-muted {
+  color: #6b7280;
+}
+
+/* Área que divide cadastro e listagem em duas colunas */
 .admin-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
+/* Campos de input e select */
 .admin-input {
   width: 100%;
   padding: 12px;
@@ -35,8 +68,16 @@
   border-radius: 8px;
   border: 1px solid #d1d5db;
   box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
 }
 
+/* Efeito visual quando clica no input */
+.admin-input:focus {
+  border-color: #2563eb;
+}
+
+/* Botão verde de cadastrar */
 .admin-btn-green {
   width: 100%;
   background: #16a34a;
@@ -45,8 +86,27 @@
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
 }
 
+/* Efeito hover do botão verde */
+.admin-btn-green:hover {
+  background: #15803d;
+}
+
+/* Cada linha da lista de usuários */
+.admin-user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Botão vermelho de excluir */
 .admin-btn-red {
   background: #ef4444;
   color: white;
@@ -54,16 +114,21 @@
   border-radius: 6px;
   padding: 6px 10px;
   cursor: pointer;
+  font-size: 13px;
 }
 
-.admin-user-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e5e7eb;
+/* Efeito hover do botão vermelho */
+.admin-btn-red:hover {
+  background: #dc2626;
 }
 
-.admin-text-muted {
-  color: #6b7280;
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+/* Em telas menores, muda de 2 colunas para 1 */
+@media (max-width: 768px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
 }
