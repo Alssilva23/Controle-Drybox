@@ -15,7 +15,8 @@
 /* botão voltar */
 .indicadores-voltar {
   margin-bottom: 20px;
-  background: #e5e7eb;
+  background: #e5e7eb; /* cinza igual admin */
+  color: #111827;
   border: none;
   border-radius: 8px;
   padding: 10px 14px;
