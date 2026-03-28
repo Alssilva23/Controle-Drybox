@@ -2,12 +2,13 @@ import { useState } from "react"
 import "./Dashboard.css"
 
 /* tela principal */
-<div className="dashboard-cards">
+function Dashboard({
   usuario,
   itens,
   aoSelecionarItem,
   aoNovoItem,
   aoAbrirAdmin,
+  aoAbrirIndicadores,
   aoSair,
 }) {
   /* texto da busca */
