@@ -302,7 +302,7 @@ function abrirIndicadores() {
   // exibe uma mensagem simples de carregamento
   if (carregando) return <div>Carregando...</div>
 
-  // Se não houver usuário logado, mostra a tela de login
+   // Se não houver usuário logado, mostra a tela de login
   if (!usuarioLogado) {
     return (
       <Login
@@ -324,6 +324,16 @@ function abrirIndicadores() {
         salvarUsuarios={setUsuarios}
         voltar={voltarDashboard}
       />
+    )
+  }
+
+  // Tela de mais utilizados
+  if (modoTela === "indicadores") {
+    return (
+      <div style={{ padding: "30px" }}>
+        <h1>Mais utilizados</h1>
+        <p>Aqui vai aparecer a tela de indicadores</p>
+      </div>
     )
   }
 
