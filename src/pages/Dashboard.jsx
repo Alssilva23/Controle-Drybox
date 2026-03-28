@@ -34,7 +34,6 @@ function Dashboard({
   /* total de peças */
   const totalPecas = itens.reduce((acc, item) => acc + Number(item.quantidade || 0), 0)
 
-
   /* itens esgotados */
   const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
 
@@ -109,27 +108,26 @@ function Dashboard({
           <p className="dashboard-subtitle">Sistema de Estoque</p>
 
           {/* botões do menu */}
-<div className="dashboard-menu">
+          <div className="dashboard-menu">
+            {/* botão administração */}
+            <button
+              type="button"
+              onClick={abrirAdministracao}
+              className="dashboard-menu-item dashboard-menu-item-active"
+            >
+              Administração
+            </button>
 
-  {/* botão administração */}
-  <button
-    type="button"
-    onClick={abrirAdministracao}
-    className="dashboard-menu-item dashboard-menu-item-active"
-  >
-    Administração
-  </button>
+            {/* botão mais utilizados */}
+            <button
+              type="button"
+              onClick={aoAbrirIndicadores}
+              className="dashboard-menu-item"
+            >
+              Mais utilizados
+            </button>
+          </div>
 
-  {/* botão para ver itens mais utilizados */}
-  <button
-    type="button"
-    onClick={aoAbrirIndicadores}
-    className="dashboard-menu-item"
-  >
-    Mais utilizados
-  </button>
-
-</div>
           {/* card com usuario logado */}
           <div className="dashboard-user-card">
             <div className="dashboard-user-name">{usuario?.nome}</div>
@@ -170,6 +168,20 @@ function Dashboard({
               <p className="dashboard-card-label">Itens Esgotados</p>
               <h2 className="dashboard-card-value dashboard-card-value-danger">{esgotados}</h2>
             </div>
+
+            <div className="dashboard-card">
+              <p className="dashboard-card-label">Alta rotatividade</p>
+
+              {itensMaisUsados.length === 0 ? (
+                <p className="dashboard-empty-state">Sem dados</p>
+              ) : (
+                itensMaisUsados.map((item, index) => (
+                  <div key={item.id}>
+                    {index + 1}. {item.nome} ({item.quantidade})
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           {/* bloco principal */}
@@ -202,8 +214,6 @@ function Dashboard({
 
             {/* campo de busca */}
             <div className="dashboard-search-wrapper">
-              <span className="dashboard-search-icon"></span>
-
               <input
                 type="text"
                 placeholder="Pesquisar por código, nome ou local"
