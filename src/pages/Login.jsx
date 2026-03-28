@@ -1,20 +1,45 @@
 import { useState } from "react"
+import "./Login.css"
 
+/**
+ * Tela de Login
+ *
+ * Responsável por:
+ * - capturar usuário e senha
+ * - validar com lista de usuários
+ * - chamar função onLogin quando válido
+ *
+ * Props:
+ * - onLogin: função chamada quando login dá certo
+ * - usuarios: lista de usuários do sistema
+ */
 function Login({ onLogin, usuarios = [] }) {
+  // Estados dos inputs
   const [usuario, setUsuario] = useState("")
   const [senha, setSenha] = useState("")
 
+  /**
+   * Função executada ao clicar em "Entrar"
+   */
   function entrar(e) {
     if (e) e.preventDefault()
 
+    // Normaliza os valores digitados
     const loginDigitado = usuario.trim().toLowerCase()
     const senhaDigitada = senha.trim()
 
+    // Validação básica
     if (!loginDigitado || !senhaDigitada) {
       alert("Preencha usuário e senha")
       return
     }
 
+    /**
+     * Procura usuário na lista
+     * Pode logar usando:
+     * - usuário (login)
+     * - nome
+     */
     const usuarioEncontrado = usuarios.find((u) => {
       const usuarioBanco = String(u.usuario || "").trim().toLowerCase()
       const nomeBanco = String(u.nome || "").trim().toLowerCase()
@@ -26,95 +51,49 @@ function Login({ onLogin, usuarios = [] }) {
       )
     })
 
+    // Se não encontrar
     if (!usuarioEncontrado) {
       alert("Usuário ou senha inválidos")
       return
     }
 
+    // Login válido → envia pro App
     onLogin(usuarioEncontrado)
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        width: "100%",
-        background: "#f3f4f6",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <form
-        onSubmit={entrar}
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          background: "#fff",
-          borderRadius: "16px",
-          padding: "32px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-          boxSizing: "border-box",
-        }}
-      >
-        <h1 style={{ color: "#22c55e", margin: 0, fontSize: "42px" }}>Intelbras</h1>
-        <h2 style={{ marginTop: "8px", marginBottom: "8px" }}>Técnico de Reparo</h2>
+    <div className="login-container">
+      <form onSubmit={entrar} className="login-box">
+        {/* Título */}
+        <h1 className="login-logo">Intelbras</h1>
+        <h2 className="login-subtitle">Técnico de Reparo</h2>
 
-        <p style={{ color: "#6b7280", marginBottom: "24px" }}>
+        <p className="login-text">
           Insira suas credenciais para gerenciar o inventário DryBox
         </p>
 
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
-          Usuário
-        </label>
+        {/* Campo usuário */}
+        <label className="login-label">Usuário</label>
         <input
           type="text"
           value={usuario}
           onChange={(e) => setUsuario(e.target.value)}
           placeholder="Digite seu usuário"
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "10px",
-            border: "1px solid #d1d5db",
-            marginBottom: "18px",
-            boxSizing: "border-box",
-          }}
+          className="login-input"
         />
 
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
-          Senha
-        </label>
+        {/* Campo senha */}
+        <label className="login-label">Senha</label>
         <input
           type="password"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           placeholder="Digite sua senha"
-          style={{
-            width: "100%",
-            padding: "14px",
-            borderRadius: "10px",
-            border: "1px solid #d1d5db",
-            marginBottom: "20px",
-            boxSizing: "border-box",
-          }}
+          className="login-input"
         />
 
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            background: "#22c55e",
-            color: "white",
-            border: "none",
-            padding: "14px",
-            borderRadius: "10px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
+        {/* Botão */}
+        <button type="submit" className="login-button">
           Entrar
         </button>
       </form>
