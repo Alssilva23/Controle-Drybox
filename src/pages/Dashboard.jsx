@@ -2,7 +2,7 @@ import { useState } from "react"
 import "./Dashboard.css"
 
 /* tela principal */
-function Dashboard({
+<div className="dashboard-cards">
   usuario,
   itens,
   aoSelecionarItem,
@@ -34,8 +34,17 @@ function Dashboard({
   const totalPecas = itens.reduce((acc, item) => acc + Number(item.quantidade || 0), 0)
 
   /* itens esgotados */
-  const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
+  /* itens esgotados */
+const esgotados = itens.filter((item) => Number(item.quantidade || 0) === 0).length
 
+/* itens mais utilizados (menor quantidade em estoque) */
+const itensMaisUsados = [...itens]
+  .sort((a, b) => Number(a.quantidade || 0) - Number(b.quantidade || 0))
+  .slice(0, 5)
+
+/* botão exportar lista */
+function exportarLista() {
+   
   /* botão exportar lista */
   function exportarLista() {
     const janela = window.open("", "", "width=900,height=700")
@@ -102,17 +111,27 @@ function Dashboard({
           <p className="dashboard-subtitle">Sistema de Estoque</p>
 
           {/* botões do menu */}
-          <div className="dashboard-menu">
-            {/* botão administração */}
-            <button
-              type="button"
-              onClick={abrirAdministracao}
-              className="dashboard-menu-item dashboard-menu-item-active"
-            >
-              Administração
-            </button>
-          </div>
+<div className="dashboard-menu">
 
+  {/* botão administração */}
+  <button
+    type="button"
+    onClick={abrirAdministracao}
+    className="dashboard-menu-item dashboard-menu-item-active"
+  >
+    Administração
+  </button>
+
+  {/* botão para ver itens mais utilizados */}
+  <button
+    type="button"
+    onClick={aoAbrirIndicadores}
+    className="dashboard-menu-item"
+  >
+    Mais utilizados
+  </button>
+
+</div>
           {/* card com usuario logado */}
           <div className="dashboard-user-card">
             <div className="dashboard-user-name">{usuario?.nome}</div>
