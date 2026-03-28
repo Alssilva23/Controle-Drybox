@@ -146,7 +146,7 @@ function Dashboard({
             <button
               type="button"
               onClick={abrirAdministracao}
-              className="dashboard-menu-button"
+              className="dashboard-menu-item dashboard-menu-item-active"
             >
               Administração
             </button>
