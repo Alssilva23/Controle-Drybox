@@ -2,18 +2,33 @@ import { useState } from "react"
 import { supabase } from "../supabase"
 import "./AdminUsuarios.css"
 
+/**
+ * Tela de administração de usuários
+ *
+ * Responsável por:
+ * - cadastrar novos usuários
+ * - listar usuários cadastrados
+ * - excluir usuários
+ * - impedir que o usuário logado exclua a si mesmo
+ */
 function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
+  // Campos do formulário de cadastro
   const [nome, setNome] = useState("")
   const [usuario, setUsuario] = useState("")
   const [senha, setSenha] = useState("")
   const [perfil, setPerfil] = useState("tecnico")
 
+  /**
+   * Cadastra um novo usuário no banco de dados
+   */
   async function cadastrarUsuario() {
+    // Verifica se todos os campos foram preenchidos
     if (!nome || !usuario || !senha || !perfil) {
       alert("Preencha todos os campos")
       return
     }
 
+    // Verifica se já existe um usuário com o mesmo login
     const usuarioJaExiste = usuarios.some(
       (u) => String(u.usuario || "").toLowerCase() === usuario.toLowerCase()
     )
@@ -23,6 +38,7 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       return
     }
 
+    // Envia os dados para a tabela "usuarios" no Supabase
     const { data, error } = await supabase
       .from("usuarios")
       .insert([
@@ -36,13 +52,16 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       .select()
       .single()
 
+    // Se der erro ao salvar no banco
     if (error) {
       alert("Erro ao salvar usuário")
       return
     }
 
+    // Atualiza a lista local na tela com o novo usuário
     salvarUsuarios([...usuarios, data])
 
+    // Limpa os campos do formulário
     setNome("")
     setUsuario("")
     setSenha("")
@@ -51,77 +70,78 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
     alert("Usuário cadastrado com sucesso")
   }
 
+  /**
+   * Exclui um usuário pelo ID
+   */
   async function excluirUsuario(id) {
+    // Impede que o usuário logado exclua a própria conta
     if (id === usuarioLogado.id) {
       alert("Você não pode excluir o usuário logado")
       return
     }
 
+    // Remove o usuário da tabela "usuarios"
     const { error } = await supabase
       .from("usuarios")
       .delete()
       .eq("id", id)
 
+    // Se der erro ao excluir
     if (error) {
       alert("Erro ao excluir usuário")
       return
     }
 
+    // Atualiza a lista local removendo o usuário excluído
     salvarUsuarios(usuarios.filter((u) => u.id !== id))
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f3f4f6", fontFamily: "Arial", padding: "30px" }}>
-      <button
-        onClick={voltar}
-        style={{
-          marginBottom: "20px",
-          background: "#e5e7eb",
-          border: "none",
-          borderRadius: "8px",
-          padding: "10px 14px",
-          cursor: "pointer",
-        }}
-      >
+    <div className="admin-container">
+      {/* Botão para voltar para a tela anterior */}
+      <button onClick={voltar} className="admin-voltar">
         ← Voltar
       </button>
 
-      <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)", marginBottom: "20px" }}>
-        <h1 style={{ marginTop: 0 }}>Administração de Usuários</h1>
-        <p style={{ color: "#6b7280" }}>
+      {/* Card de título da página */}
+      <div className="admin-card">
+        <h1 className="admin-titulo">Administração de Usuários</h1>
+        <p className="admin-text-muted">
           Apenas admin pode cadastrar e excluir usuários.
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
-          <h2>Cadastrar Usuário</h2>
+      {/* Área principal dividida em duas colunas */}
+      <div className="admin-grid">
+        {/* Coluna da esquerda: formulário de cadastro */}
+        <div className="admin-card">
+          <h2 className="admin-subtitulo">Cadastrar Usuário</h2>
 
           <input
+            className="admin-input"
             placeholder="Nome"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            style={inputStyle}
           />
 
           <input
+            className="admin-input"
             placeholder="Usuário"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
-            style={inputStyle}
           />
 
           <input
+            className="admin-input"
             placeholder="Senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            style={inputStyle}
           />
 
           <select
+            className="admin-input"
             value={perfil}
             onChange={(e) => setPerfil(e.target.value)}
-            style={inputStyle}
           >
             <option value="tecnico">Técnico</option>
             <option value="lider">Líder</option>
@@ -129,28 +149,20 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
             <option value="admin">Admin</option>
           </select>
 
-          <button onClick={cadastrarUsuario} style={btnGreen}>
+          <button onClick={cadastrarUsuario} className="admin-btn-green">
             Cadastrar Usuário
           </button>
         </div>
 
-        <div style={{ background: "white", borderRadius: "14px", padding: "24px", boxShadow: "0 4px 14px rgba(0,0,0,0.05)" }}>
-          <h2>Usuários Cadastrados</h2>
+        {/* Coluna da direita: lista de usuários */}
+        <div className="admin-card">
+          <h2 className="admin-subtitulo">Usuários Cadastrados</h2>
 
           {usuarios.length === 0 ? (
-            <p style={{ color: "#6b7280" }}>Nenhum usuário cadastrado.</p>
+            <p className="admin-text-muted">Nenhum usuário cadastrado.</p>
           ) : (
             usuarios.map((u) => (
-              <div
-                key={u.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "10px",
-                  paddingBottom: "10px",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
+              <div key={u.id} className="admin-user-item">
                 <div>
                   <strong>{u.nome}</strong>
                   <br />
@@ -159,7 +171,10 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
                   </small>
                 </div>
 
-                <button onClick={() => excluirUsuario(u.id)} style={btnRed}>
+                <button
+                  onClick={() => excluirUsuario(u.id)}
+                  className="admin-btn-red"
+                >
                   Excluir
                 </button>
               </div>
@@ -169,34 +184,6 @@ function AdminUsuarios({ usuarioLogado, usuarios, salvarUsuarios, voltar }) {
       </div>
     </div>
   )
-}
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "10px",
-  borderRadius: "8px",
-  border: "1px solid #d1d5db",
-  boxSizing: "border-box",
-}
-
-const btnGreen = {
-  width: "100%",
-  background: "#16a34a",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  padding: "12px",
-  cursor: "pointer",
-}
-
-const btnRed = {
-  background: "#ef4444",
-  color: "white",
-  border: "none",
-  borderRadius: "6px",
-  padding: "6px 10px",
-  cursor: "pointer",
 }
 
 export default AdminUsuarios
