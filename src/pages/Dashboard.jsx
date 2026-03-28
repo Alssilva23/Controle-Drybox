@@ -138,20 +138,19 @@ function Dashboard({
           </div>
 
           {/* Menu lateral */}
-          <div className="dashboard-menu">
-            <div className="dashboard-menu-item dashboard-menu-item-active">
-              Controle de Componentes
-            </div>
+  <div className="dashboard-menu">
+  <div className="dashboard-menu-item dashboard-menu-item-active">
+    Controle de Componentes
+  </div>
 
-            <button
-              type="button"
-              onClick={abrirAdministracao}
-              className="dashboard-menu-item dashboard-menu-item-active"
-            >
-              Administração
-            </button>
-          </div>
-        </aside>
+  <div
+    onClick={abrirAdministracao}
+    className="dashboard-menu-item dashboard-menu-item-active"
+  >
+    Administração
+  </div>
+</div>
+</aside>
 
         {/* Conteúdo principal */}
         <main className="dashboard-content">
