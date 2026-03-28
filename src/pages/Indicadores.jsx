@@ -36,7 +36,9 @@ function Indicadores({ itens, aoVoltar }) {
             itensMaisUsados.map((item, index) => (
               <div key={item.id} className="indicadores-item">
                 <span className="indicadores-rank">#{index + 1}</span>
-                <span className="indicadores-nome">{item.nome}</span>
+                <span className="indicadores-nome">
+  {item.codigo} - {item.nome}
+</span>
 
                 {/* agora mostra SAÍDAS */}
                 <span className="indicadores-qtd">
