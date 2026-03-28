@@ -1,3 +1,4 @@
+import "./ItemDetalhe.css"
 import { useState } from "react"
 
 function ItemDetalhe({
