@@ -120,12 +120,12 @@ function Dashboard({
 
             {/* botão mais utilizados */}
             <button
-              type="button"
-              onClick={aoAbrirIndicadores}
-              className="dashboard-menu-item"
-            >
-              Mais utilizados
-            </button>
+  type="button"
+  onClick={aoAbrirIndicadores}
+  className="dashboard-menu-item dashboard-menu-item-active"
+>
+  Mais utilizados
+</button>
           </div>
 
           {/* card com usuario logado */}
