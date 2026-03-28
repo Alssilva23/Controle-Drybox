@@ -111,12 +111,12 @@ function Dashboard({
             </button>
 
             <button
-              type="button"
-              onClick={aoAbrirIndicadores}
-              className="dashboard-menu-item"
-            >
-              Mais utilizados
-            </button>
+  type="button"
+  onClick={aoAbrirIndicadores}
+  className="dashboard-menu-item dashboard-menu-item-active"
+>
+  Mais utilizados
+</button>
           </div>
 
           <div className="dashboard-user-card">
