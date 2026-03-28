@@ -35,7 +35,6 @@ function ItemDetalhe({
 
     await registrarMovimentacao(item.id, tipo, quantidade, comentario)
 
-    // limpa os campos
     setQuantidade(1)
     setComentario("")
   }
@@ -97,7 +96,7 @@ function ItemDetalhe({
         ← Voltar
       </button>
 
-      {/* topo com nome e quantidade */}
+      {/* topo */}
       <div
         style={{
           background: "white",
@@ -133,7 +132,6 @@ function ItemDetalhe({
             {item.quantidade} UND
           </div>
 
-          {/* botão excluir item */}
           {usuario?.perfil === "admin" && (
             <button
               onClick={excluirItem}
@@ -153,103 +151,82 @@ function ItemDetalhe({
         </div>
       </div>
 
-      {/* layout principal */}
+      {/* layout */}
       <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
 
         {/* HISTÓRICO */}
-<div
-  style={{
-    background: "white",
-    borderRadius: "12px",
-    padding: "16px",
-    boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-    flex: 1,
-    minWidth: "300px",
-    maxHeight: "500px",
-    overflowY: "auto",
-  }}
->
-  <h3>Histórico de Uso</h3>
-
-  {item.historico.length === 0 ? (
-    <p style={{ color: "#6b7280" }}>Nenhuma movimentação ainda.</p>
-  ) : (
-    [...(item.historico || [])]
-      .sort((a, b) => new Date(b.data) - new Date(a.data))
-      .map((mov, index) => (
         <div
-          key={`${mov.data}-${index}`}
           style={{
-            padding: "8px 0",
-            borderBottom: "1px solid #e5e7eb",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            background: "white",
+            borderRadius: "12px",
+            padding: "16px",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
+            flex: 1,
+            minWidth: "300px",
+            maxHeight: "500px",
+            overflowY: "auto",
           }}
         >
-          <div>
-            <div style={{ fontWeight: "bold", fontSize: "14px" }}>
-              {mov.usuario} —{" "}
-              <span
-                style={{
-                  color: mov.tipo === "entrada" ? "#16a34a" : "#dc2626",
-                }}
-              >
-                {mov.tipo === "entrada" ? "adicionou" : "retirou"}
-              </span>
-            </div>
+          <h3>Histórico de Uso</h3>
 
-            <div style={{ fontSize: "13px", color: "#6b7280" }}>
-              {mov.quantidade} UND — {mov.data}
-            </div>
+          {item.historico.length === 0 ? (
+            <p style={{ color: "#6b7280" }}>Nenhuma movimentação ainda.</p>
+          ) : (
+            [...(item.historico || [])]
+              .sort((a, b) => new Date(b.data) - new Date(a.data))
+              .map((mov, index) => (
+                <div
+                  key={`${mov.data}-${index}`}
+                  style={{
+                    padding: "8px 0",
+                    borderBottom: "1px solid #e5e7eb",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: "bold", fontSize: "14px" }}>
+                      {mov.usuario} —{" "}
+                      <span
+                        style={{
+                          color:
+                            mov.tipo === "entrada" ? "#16a34a" : "#dc2626",
+                        }}
+                      >
+                        {mov.tipo === "entrada" ? "adicionou" : "retirou"}
+                      </span>
+                    </div>
 
-            {mov.comentario && (
-              <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                {mov.comentario}
-              </div>
-            )}
-          </div>
+                    <div style={{ fontSize: "13px", color: "#6b7280" }}>
+                      {mov.quantidade} UND — {mov.data}
+                    </div>
 
-          {usuario?.perfil === "admin" && (
-            <button
-              onClick={() => excluirRegistro(index)}
-              style={{
-                background: "#ef4444",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                padding: "4px 8px",
-                cursor: "pointer",
-                fontSize: "11px",
-              }}
-            >
-              X
-            </button>
-          )}
-        </div>
-      ))
-  )}
-</div>
+                    {mov.comentario && (
+                      <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                        {mov.comentario}
+                      </div>
+                    )}
+                  </div>
 
-                {/* botão excluir registro */}
-                {usuario?.perfil === "admin" && (
-                  <button
-                    onClick={() => excluirRegistro(index)}
-                    style={{
-                      background: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "11px",
-                    }}
-                  >
-                    X
-                  </button>
-                )}
-              </div>
-            ))
+                  {usuario?.perfil === "admin" && (
+                    <button
+                      onClick={() => excluirRegistro(index)}
+                      style={{
+                        background: "#ef4444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                        fontSize: "11px",
+                      }}
+                    >
+                      X
+                    </button>
+                  )}
+                </div>
+              ))
           )}
         </div>
 
@@ -268,9 +245,7 @@ function ItemDetalhe({
 
           <p>Ação</p>
 
-          {/* BOTÕES AJUSTADOS (única mudança 🔥) */}
           <div style={{ display: "flex", gap: "10px", marginBottom: "12px" }}>
-
             <button
               onClick={() => setTipo("entrada")}
               style={{
@@ -302,7 +277,6 @@ function ItemDetalhe({
             >
               Saída
             </button>
-
           </div>
 
           <p>Quantidade</p>
