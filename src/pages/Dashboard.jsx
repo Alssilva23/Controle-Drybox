@@ -139,10 +139,6 @@ function Dashboard({
 
           {/* Menu lateral */}
   <div className="dashboard-menu">
-  <div className="dashboard-menu-item dashboard-menu-item-active">
-    Controle de Componentes
-  </div>
-
   <button
     onClick={abrirAdministracao}
     className="dashboard-menu-item dashboard-menu-item-active"
