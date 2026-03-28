@@ -143,12 +143,12 @@ function Dashboard({
     Controle de Componentes
   </div>
 
-  <div
+  <button
     onClick={abrirAdministracao}
     className="dashboard-menu-item dashboard-menu-item-active"
   >
     Administração
-  </div>
+  </button>
 </div>
 </aside>
 
