@@ -21,9 +21,10 @@ function Indicadores({ itens, aoVoltar }) {
       <div className="indicadores-container">
 
         {/* botão voltar */}
-        <button onClick={aoVoltar} className="indicadores-voltar">
-          ← Voltar
-        </button>
+      <button
+  onClick={aoVoltar}
+  style={{ background: "#e5e7eb", color: "black" }}
+>
 
         {/* título */}
         <h1 className="indicadores-titulo">Itens mais utilizados</h1>
