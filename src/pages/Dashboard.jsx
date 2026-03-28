@@ -185,7 +185,7 @@ function Dashboard({
 
             {/* campo de busca */}
             <div className="dashboard-search-wrapper">
-              <span className="dashboard-search-icon">🔍</span>
+              <span className="dashboard-search-icon"></span>
 
               <input
                 type="text"
