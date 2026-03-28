@@ -136,7 +136,6 @@ function Dashboard({
         <main className="dashboard-content">
           <div className="dashboard-header">
             <h1 className="dashboard-title">Bem-vindo, {usuario?.nome}</h1>
-            <p className="dashboard-description">Gerencie o inventário local do DryBox</p>
           </div>
 
           {/* cards */}
