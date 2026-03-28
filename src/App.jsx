@@ -349,16 +349,16 @@ function abrirIndicadores() {
   }
 
   // Tela principal do sistema
-  return (
-    <Dashboard
-      usuario={usuarioLogado}
-      itens={itens}
-      aoSelecionarItem={abrirItem}
-      aoNovoItem={() => setModoTela("novo-item")}
-      aoAbrirAdmin={() => setModoTela("admin-usuarios")}
-      aoSair={sair}
-    />
-  )
-}
+return (
+  <Dashboard
+    usuario={usuarioLogado}
+    itens={itens}
+    aoSelecionarItem={abrirItem}
+    aoNovoItem={() => setModoTela("novo-item")}
+    aoAbrirAdmin={() => setModoTela("admin-usuarios")}
+    aoAbrirIndicadores={abrirIndicadores}
+    aoSair={sair}
+  />
+)
 
 export default App
