@@ -329,14 +329,14 @@ function abrirIndicadores() {
   }
 
   // Tela de mais utilizados
-  if (modoTela === "indicadores") {
-    return (
-      <div style={{ padding: "30px" }}>
-        <h1>Mais utilizados</h1>
-        <p>Aqui vai aparecer a tela de indicadores</p>
-      </div>
-    )
-  }
+if (modoTela === "indicadores") {
+  return (
+    <Indicadores
+      itens={itens}
+      aoVoltar={voltarDashboard}
+    />
+  )
+}
 
   // Tela de cadastro de novo item
   if (modoTela === "novo-item") {
