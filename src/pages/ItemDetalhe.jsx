@@ -1,6 +1,13 @@
-import "./ItemDetalhe.css"
 import { useState } from "react"
+import "./ItemDetalhe.css"
 
+/**
+ * Tela de detalhe do item
+ * Aqui você:
+ * - vê informações do item
+ * - vê histórico
+ * - registra entrada/saída
+ */
 function ItemDetalhe({
   item,
   voltar,
@@ -9,191 +16,114 @@ function ItemDetalhe({
   removerHistorico,
   removerItem,
 }) {
+
+  // controla se é entrada ou saída
   const [tipo, setTipo] = useState("entrada")
+
+  // quantidade digitada
   const [quantidade, setQuantidade] = useState(1)
+
+  // comentário da movimentação
   const [comentario, setComentario] = useState("")
 
+  /**
+   * Salvar movimentação
+   */
   async function salvar() {
     if (!comentario.trim()) {
-      alert("Informe o motivo da movimentação. Ex: Sobra ordem 1563")
+      alert("Informe o motivo da movimentação")
       return
     }
 
     await registrarMovimentacao(item.id, tipo, quantidade, comentario)
+
+    // reset dos campos
     setQuantidade(1)
     setComentario("")
   }
 
+  /**
+   * Excluir registro do histórico
+   */
   async function excluirRegistro(index) {
-    if (!removerHistorico) return
-    if (usuario?.perfil !== "admin") {
-      alert("Somente admin pode excluir registros")
-      return
-    }
-
-    const confirmar = window.confirm("Deseja realmente excluir este registro?")
-    if (!confirmar) return
+    if (usuario?.perfil !== "admin") return
+    if (!window.confirm("Excluir registro?")) return
 
     await removerHistorico(item.id, index)
   }
 
+  /**
+   * Excluir item inteiro
+   */
   async function excluirItem() {
-    if (!removerItem) return
-    if (usuario?.perfil !== "admin") {
-      alert("Somente admin pode excluir itens")
-      return
-    }
+    if (usuario?.perfil !== "admin") return
 
     await removerItem(item.id)
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f3f4f6",
-        fontFamily: "Arial",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <button
-        onClick={voltar}
-        style={{
-          marginBottom: "16px",
-          background: "#e5e7eb",
-          border: "none",
-          borderRadius: "6px",
-          padding: "8px 12px",
-          cursor: "pointer",
-        }}
-      >
+    <div className="item-page">
+
+      {/* botão voltar */}
+      <button onClick={voltar} className="item-voltar">
         ← Voltar
       </button>
 
-      {/* Topo compacto */}
-      <div
-        style={{
-          background: "white",
-          borderRadius: "12px",
-          padding: "16px 20px",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-          marginBottom: "16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "12px",
-        }}
-      >
+      {/* topo com nome e código */}
+      <div className="item-topo">
         <div>
-          <p style={{ color: "#16a34a", fontWeight: "bold", margin: 0 }}>
-            {item.codigo}
-          </p>
-          <h2 style={{ margin: "4px 0 0 0", fontSize: "20px" }}>{item.nome}</h2>
+          <p className="item-codigo">{item.codigo}</p>
+          <h2 className="item-nome">{item.nome}</h2>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              padding: "6px 12px",
-              border: "1px solid #d1d5db",
-              borderRadius: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            {item.quantidade} UND
-          </div>
+        {/* quantidade + botão excluir */}
+        <div className="item-info">
+          <div className="item-qtd">{item.quantidade} UND</div>
 
           {usuario?.perfil === "admin" && (
-            <button
-              onClick={excluirItem}
-              style={{
-                background: "#dc2626",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-            >
+            <button onClick={excluirItem} className="item-excluir">
               Excluir Item
             </button>
           )}
         </div>
       </div>
 
-      {/* Container horizontal: histórico e formulário */}
-      <div
-        style={{
-          display: "flex",
-          gap: "16px",
-          flexWrap: "wrap",
-        }}
-      >
-        {/* Histórico de Uso */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            padding: "16px",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-            flex: 1,
-            minWidth: "300px",
-            maxHeight: "500px",
-            overflowY: "auto",
-          }}
-        >
-          <h3 style={{ marginTop: 0 }}>Histórico de Uso</h3>
+      {/* container principal */}
+      <div className="item-container">
+
+        {/* HISTÓRICO */}
+        <div className="card historico">
+          <h3>Histórico</h3>
 
           {item.historico.length === 0 ? (
-            <p style={{ color: "#6b7280" }}>Nenhuma movimentação ainda.</p>
+            <p>Sem movimentação</p>
           ) : (
             item.historico.map((mov, index) => (
-              <div
-                key={`${mov.data}-${index}`}
-                style={{
-                  padding: "8px 0",
-                  borderBottom: "1px solid #e5e7eb",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <div key={index} className="historico-item">
+
                 <div>
-                  <div style={{ fontWeight: "bold", fontSize: "14px" }}>
-                    {mov.usuario} —{" "}
-                    <span
-                      style={{
-                        color: mov.tipo === "entrada" ? "#16a34a" : "#dc2626",
-                      }}
-                    >
-                      {mov.tipo === "entrada" ? "adicionou" : "retirou"}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: "13px", color: "#6b7280" }}>
-                    {mov.quantidade} UND — {mov.data}
-                  </div>
-                  {mov.comentario && (
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>{mov.comentario}</div>
-                  )}
+                  <b>{mov.usuario}</b> —{" "}
+
+                  {/* cor muda conforme tipo */}
+                  <span className={
+                    mov.tipo === "entrada"
+                      ? "historico-tipo-entrada"
+                      : "historico-tipo-saida"
+                  }>
+                    {mov.tipo === "entrada" ? "entrada" : "saída"}
+                  </span>
+
+                  <br />
+                  {mov.quantidade} UND
                 </div>
 
+                {/* botão excluir só admin */}
                 {usuario?.perfil === "admin" && (
                   <button
                     onClick={() => excluirRegistro(index)}
-                    style={{
-                      background: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      padding: "4px 8px",
-                      cursor: "pointer",
-                      fontSize: "11px",
-                    }}
+                    className="historico-excluir"
                   >
-                    Excluir
+                    X
                   </button>
                 )}
               </div>
@@ -201,95 +131,56 @@ function ItemDetalhe({
           )}
         </div>
 
-        {/* Registrar Movimentação */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: "12px",
-            padding: "16px",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.05)",
-            flex: 1,
-            minWidth: "300px",
-          }}
-        >
-          <h3 style={{ marginTop: 0 }}>Registrar Movimentação</h3>
+        {/* FORMULÁRIO */}
+        <div className="card">
+          <h3>Registrar</h3>
 
-          <p style={{ marginBottom: "8px" }}>Ação</p>
-          <div style={{ display: "flex", gap: "10px", marginBottom: "12px" }}>
+          <p>Ação</p>
+
+          {/* botões entrada/saida */}
+          <div style={{ display: "flex", gap: "10px" }}>
+
             <button
+              className={`mov-btn mov-btn-entrada ${tipo === "entrada" ? "active" : ""}`}
               onClick={() => setTipo("entrada")}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "none",
-                cursor: "pointer",
-                background: tipo === "entrada" ? "#d1fae5" : "#f3f4f6",
-              }}
             >
               Entrada
             </button>
+
             <button
+              className={`mov-btn mov-btn-saida ${tipo === "saida" ? "active" : ""}`}
               onClick={() => setTipo("saida")}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "none",
-                cursor: "pointer",
-                background: tipo === "saida" ? "#fee2e2" : "#f3f4f6",
-              }}
             >
               Saída
             </button>
+
           </div>
 
-          <p style={{ marginBottom: "8px" }}>Quantidade</p>
+          <p>Quantidade</p>
+
+          {/* input quantidade */}
           <input
             type="number"
             value={quantidade}
             onChange={(e) => setQuantidade(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #d1d5db",
-              marginBottom: "12px",
-            }}
+            className="input"
           />
 
-          <p style={{ marginBottom: "8px" }}>Comentário</p>
+          <p>Comentário</p>
+
+          {/* campo comentário */}
           <textarea
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
-            placeholder="Ex: Sobra ordem 1563"
-            style={{
-              width: "100%",
-              minHeight: "80px",
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #d1d5db",
-              marginBottom: "12px",
-              resize: "none",
-            }}
+            className="textarea"
           />
 
-          <button
-            onClick={salvar}
-            style={{
-              width: "100%",
-              background: "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              padding: "12px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            Registrar Movimentação
+          {/* botão salvar */}
+          <button onClick={salvar} className="btn-salvar">
+            Salvar
           </button>
         </div>
+
       </div>
     </div>
   )
