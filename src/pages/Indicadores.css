@@ -15,13 +15,13 @@
 /* botão voltar */
 .indicadores-voltar {
   margin-bottom: 20px;
-  background: #e5e7eb; /* cinza igual admin */
+  background: #e5e7eb;
   color: #111827;
   border: none;
   border-radius: 8px;
   padding: 10px 14px;
   cursor: pointer;
-}
+}}
 
 /* título */
 .indicadores-titulo {
