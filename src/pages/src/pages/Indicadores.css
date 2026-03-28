@@ -58,3 +58,86 @@
   font-weight: bold;
   color: #dc2626;
 }
+/* página geral */
+.indicadores-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+}
+
+/* centraliza conteúdo */
+.indicadores-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* botão voltar */
+.indicadores-voltar {
+  margin-bottom: 20px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.indicadores-voltar:hover {
+  opacity: 0.9;
+}
+
+/* título */
+.indicadores-titulo {
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+/* card */
+.indicadores-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* item da lista */
+.indicadores-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.indicadores-item:last-child {
+  border-bottom: none;
+}
+
+/* posição */
+.indicadores-rank {
+  min-width: 50px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* nome */
+.indicadores-nome {
+  flex: 1;
+  color: #111827;
+  font-weight: 500;
+}
+
+/* quantidade */
+.indicadores-qtd {
+  min-width: 60px;
+  text-align: right;
+  font-weight: bold;
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
